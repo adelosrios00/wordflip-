@@ -1,0 +1,79 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Teacher {
+  id           String  @id @default(cuid())
+  username     String  @unique
+  passwordHash String
+  classes      Class[]
+}
+
+model Class {
+  id        String           @id @default(cuid())
+  name      String
+  teacherId String
+  teacher   Teacher          @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  students  Student[]
+  groups    ClassWordGroup[]
+}
+
+model ClassWordGroup {
+  classId     String
+  wordGroupId String
+  class       Class     @relation(fields: [classId], references: [id], onDelete: Cascade)
+  wordGroup   WordGroup @relation(fields: [wordGroupId], references: [id], onDelete: Cascade)
+  @@id([classId, wordGroupId])
+}
+
+model Word {
+  id       String     @id @default(cuid())
+  spanish  String
+  english  String
+  imageUrl String?
+  order    Int
+  groupId  String
+  group    WordGroup  @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  progress Progress[]
+
+  @@unique([groupId, order])
+}
+
+model WordGroup {
+  id        String           @id @default(cuid())
+  name      String
+  order     Int              @unique
+  groupType String           @default("words") @map("type")
+  words     Word[]
+  progress  Progress[]
+  classes   ClassWordGroup[]
+}
+
+model Student {
+  id       String     @id @default(cuid())
+  name     String     @unique
+  username String?    @unique
+  password String?
+  classId  String?
+  class    Class?     @relation(fields: [classId], references: [id])
+  progress Progress[]
+}
+
+model Progress {
+  id          String    @id @default(cuid())
+  studentId   String
+  wordGroupId String
+  phase       String
+  wordId      String
+  completedAt DateTime  @default(now())
+  student     Student   @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  wordGroup   WordGroup @relation(fields: [wordGroupId], references: [id], onDelete: Cascade)
+  word        Word      @relation(fields: [wordId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, wordGroupId, phase, wordId])
+}
