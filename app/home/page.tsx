@@ -8,12 +8,17 @@ import { LogoutStudentButton } from "./LogoutStudentButton";
 export default async function StudentHome() {
   const student = await getStudent();
   if (!student) redirect("/student/login");
+
   if (!student.classId) {
     return (
-      <main className="max-w-lg mx-auto p-8 pt-16 text-center">
-        <div className="text-6xl mb-4">😕</div>
-        <h1 className="text-2xl font-bold text-gray-700 mb-3">Sin clase asignada</h1>
-        <p className="text-gray-400">Tu profesor todavía no te ha asignado a ninguna clase. Vuelve más tarde.</p>
+      <main className="max-w-lg mx-auto px-6 py-20 text-center">
+        <div className="w-12 h-12 rounded-2xl bg-slate-100 flex items-center justify-center mx-auto mb-5">
+          <svg className="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" strokeWidth="1.75" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+        <h1 className="text-xl font-bold text-slate-800 mb-2">Sin clase asignada</h1>
+        <p className="text-slate-500 text-sm">Tu profesor todavía no te ha asignado a ninguna clase. Vuelve más tarde.</p>
       </main>
     );
   }
@@ -47,23 +52,21 @@ export default async function StudentHome() {
   }
 
   return (
-    <main className="max-w-2xl mx-auto p-6">
-      {/* Header */}
+    <main className="max-w-xl mx-auto px-5 py-8">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">Hola, {student.name} 👋</h1>
-          <p className="text-gray-400 text-sm mt-0.5">Clase: {cls.name}</p>
+          <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-1">{cls.name}</p>
+          <h1 className="text-xl font-bold tracking-tight text-slate-900">Hola, {student.name}</h1>
         </div>
         <LogoutStudentButton />
       </div>
 
       {cls.groups.length === 0 ? (
-        <div className="text-center py-20">
-          <div className="text-6xl mb-4">📭</div>
-          <p className="text-gray-400 text-xl">Tu profesor todavía no ha asignado grupos a tu clase.</p>
+        <div className="bg-white border-2 border-dashed border-slate-200 rounded-2xl p-12 text-center">
+          <p className="text-slate-400 text-sm">Tu profesor todavía no ha asignado grupos a tu clase.</p>
         </div>
       ) : (
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-3">
           {cls.groups.map(({ wordGroup: g }) => {
             const mastery = getMastery(g.id, g._count.words);
             const isComplete = mastery >= 100;
@@ -72,33 +75,39 @@ export default async function StudentHome() {
               <Link
                 key={g.id}
                 href={`/practice/${g.id}`}
-                className="block bg-white rounded-2xl border-2 border-gray-200 p-5 hover:border-blue-400 hover:shadow-sm transition-all group"
+                className="block bg-white rounded-xl border border-slate-200 p-5 hover:border-blue-300 hover:shadow-sm transition-all group"
               >
                 <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-3">
-                    <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${
-                      g.groupType === "phrases" ? "bg-purple-100 text-purple-700" : "bg-blue-100 text-blue-700"
+                  <div className="flex items-center gap-2.5">
+                    <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full ${
+                      g.groupType === "phrases"
+                        ? "bg-violet-50 text-violet-600"
+                        : "bg-blue-50 text-blue-600"
                     }`}>
-                      {g.groupType === "phrases" ? "💬 Frases" : "📝 Palabras"}
+                      {g.groupType === "phrases" ? "Frases" : "Palabras"}
                     </span>
-                    <h2 className="text-xl font-bold text-gray-800">{g.name}</h2>
+                    <h2 className="font-semibold text-slate-800">{g.name}</h2>
                   </div>
-                  <span className={`text-2xl font-bold ${
-                    isComplete ? "text-green-600" : isStarted ? "text-blue-600" : "text-gray-300"
+                  <span className={`text-sm font-bold ${
+                    isComplete ? "text-emerald-600" : isStarted ? "text-blue-600" : "text-slate-300"
                   }`}>
-                    {isComplete ? "✅" : `${mastery}%`}
+                    {isComplete ? "Completado" : `${mastery}%`}
                   </span>
                 </div>
-                <div className="w-full bg-gray-100 rounded-full h-3">
+                <div className="w-full bg-slate-100 rounded-full h-1.5">
                   <div
-                    className={`h-3 rounded-full transition-all duration-500 ${
-                      isComplete ? "bg-green-500" : isStarted ? "bg-blue-500" : "bg-gray-200"
+                    className={`h-1.5 rounded-full transition-all duration-500 ${
+                      isComplete ? "bg-emerald-500" : isStarted ? "bg-blue-500" : "bg-slate-200"
                     }`}
                     style={{ width: `${mastery}%` }}
                   />
                 </div>
-                <p className="text-gray-400 text-sm mt-2">
-                  {isComplete ? "¡Completado! Puedes volver a practicar" : isStarted ? "Continúa practicando" : "Empieza a practicar →"}
+                <p className="text-slate-400 text-xs mt-2.5">
+                  {isComplete
+                    ? "Puedes volver a practicar"
+                    : isStarted
+                    ? "Continúa practicando"
+                    : "Empieza a practicar"}
                 </p>
               </Link>
             );

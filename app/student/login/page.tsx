@@ -30,51 +30,61 @@ export default function StudentLogin() {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-blue-50 to-cyan-50 flex items-center justify-center p-8">
-      <div className="bg-white rounded-3xl shadow-lg p-10 w-full max-w-md">
-        <div className="text-center mb-8">
-          <div className="text-6xl mb-3">🎒</div>
-          <h1 className="text-3xl font-bold text-gray-800">Acceso alumno</h1>
-          <p className="text-gray-400 mt-1">Entra con tus credenciales</p>
+    <main className="min-h-screen bg-slate-50 flex items-center justify-center p-6">
+      <div className="w-full max-w-sm">
+        <Link href="/" className="inline-flex items-center gap-1.5 text-slate-400 hover:text-slate-600 text-sm mb-8 transition-colors">
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15 18l-6-6 6-6" />
+          </svg>
+          Volver
+        </Link>
+
+        <div className="mb-7">
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900">Acceso alumnos</h1>
+          <p className="text-slate-500 text-sm mt-1">Introduce tu usuario y contraseña</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <input
-            type="text"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            placeholder="Usuario"
-            required
-            autoFocus
-            autoComplete="username"
-            className="w-full text-xl border-2 border-gray-200 rounded-2xl px-5 py-4 focus:border-blue-500 focus:outline-none bg-gray-50"
-          />
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Contraseña"
-            required
-            autoComplete="current-password"
-            className="w-full text-xl border-2 border-gray-200 rounded-2xl px-5 py-4 focus:border-blue-500 focus:outline-none bg-gray-50"
-          />
-          {error && (
-            <p className="text-red-500 text-center font-semibold bg-red-50 py-3 rounded-xl">
-              {error}
-            </p>
-          )}
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-4 bg-blue-600 text-white text-xl font-bold rounded-2xl hover:bg-blue-700 disabled:opacity-50 transition-all mt-2"
-          >
-            {loading ? "Entrando..." : "Entrar →"}
-          </button>
-        </form>
-
-        <Link href="/" className="block mt-6 text-center text-gray-400 hover:text-gray-600 text-sm">
-          ← Volver al inicio
-        </Link>
+        <div className="bg-white border border-slate-200 rounded-2xl p-7 shadow-sm">
+          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1.5">Usuario</label>
+              <input
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="nombre.apellido"
+                required
+                autoFocus
+                autoComplete="username"
+                className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-slate-900 placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all bg-slate-50 text-sm"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1.5">Contraseña</label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                required
+                autoComplete="current-password"
+                className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-slate-900 placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all bg-slate-50 text-sm"
+              />
+            </div>
+            {error && (
+              <p className="text-red-600 text-sm bg-red-50 border border-red-100 rounded-xl px-4 py-2.5">
+                {error}
+              </p>
+            )}
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full py-2.5 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 disabled:opacity-50 transition-all text-sm mt-1"
+            >
+              {loading ? "Entrando..." : "Entrar"}
+            </button>
+          </form>
+        </div>
       </div>
     </main>
   );
