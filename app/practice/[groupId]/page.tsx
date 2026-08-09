@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import { prisma } from "@/app/lib/prisma";
 import { getStudent } from "@/app/lib/auth";
 import { redirect, notFound } from "next/navigation";

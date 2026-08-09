@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import { prisma } from "@/app/lib/prisma";
 import Link from "next/link";
 import { redirect } from "next/navigation";
