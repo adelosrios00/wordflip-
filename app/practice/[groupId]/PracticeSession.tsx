@@ -371,20 +371,6 @@ export function PracticeSession({ words, studentId, groupId, groupName, groupTyp
         const promptLen = prompt.length;
         const promptSize = promptLen > 60 ? "text-lg" : promptLen > 35 ? "text-2xl" : promptLen > 20 ? "text-3xl" : "text-4xl";
 
-        // Character-by-character diff
-        function renderDiff(typed: string, correct: string) {
-          const norm = (s: string) => s.toLowerCase();
-          return correct.split("").map((ch, i) => {
-            const typedCh = typed[i] ?? "";
-            const ok = norm(typedCh) === norm(ch);
-            return (
-              <span key={i} className={ok ? "text-emerald-600" : "text-red-500 font-bold underline decoration-2"}>
-                {ch}
-              </span>
-            );
-          });
-        }
-
         return (
           <div>
             <div className="flex justify-center mb-4">
@@ -447,19 +433,11 @@ export function PracticeSession({ words, studentId, groupId, groupName, groupTyp
               ))}
             </div>
 
-            {/* Error feedback — stays visible, shows diff */}
+            {/* Error feedback — no correct answer shown */}
             {typWrong && (
-              <div className="mt-5 max-w-md mx-auto bg-red-50 border-2 border-red-200 rounded-2xl p-4">
-                <p className="text-red-600 font-bold text-sm mb-2 text-center">Incorrecto — corrige tu respuesta:</p>
-                <div className="text-center text-lg font-mono leading-relaxed break-words">
-                  {renderDiff(typVal, target)}
-                </div>
-                {typVal.length < target.length && (
-                  <p className="text-red-400 text-xs text-center mt-1">
-                    Faltan {target.length - typVal.length} caracteres
-                  </p>
-                )}
-              </div>
+              <p className="text-red-500 font-semibold text-sm text-center mt-4">
+                Incorrecto, inténtalo de nuevo
+              </p>
             )}
             {typCorrect && (
               <p className="text-emerald-600 font-bold text-lg text-center mt-5">¡Correcto!</p>
