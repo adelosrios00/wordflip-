@@ -4,6 +4,7 @@ import { getTeacher } from "@/app/lib/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { LogoutTeacherButton } from "./LogoutTeacherButton";
+import { InviteButton } from "./InviteButton";
 
 export default async function TeacherDashboard() {
   const teacher = await getTeacher();
@@ -35,6 +36,13 @@ export default async function TeacherDashboard() {
           <LogoutTeacherButton />
         </div>
       </div>
+
+      <section className="mb-10">
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-base font-semibold text-slate-700">Invitar otro profesor</h2>
+        </div>
+        <InviteButton />
+      </section>
 
       <section className="mb-10">
         <div className="flex items-center justify-between mb-4">

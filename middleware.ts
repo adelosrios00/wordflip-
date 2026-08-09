@@ -4,7 +4,7 @@ export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Teacher routes
-  const isTeacherPublic = pathname === "/teacher/login" || pathname === "/teacher/setup";
+  const isTeacherPublic = pathname === "/teacher/login" || pathname === "/teacher/setup" || pathname === "/teacher/register";
   if (pathname.startsWith("/teacher") && !isTeacherPublic) {
     const session = request.cookies.get("teacher_session");
     if (!session?.value) {

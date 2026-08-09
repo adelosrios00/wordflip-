@@ -8,10 +8,20 @@ datasource db {
 }
 
 model Teacher {
-  id           String  @id @default(cuid())
-  username     String  @unique
+  id           String          @id @default(cuid())
+  username     String          @unique
   passwordHash String
   classes      Class[]
+  invites      TeacherInvite[]
+}
+
+model TeacherInvite {
+  id        String    @id @default(cuid())
+  code      String    @unique
+  createdBy String
+  teacher   Teacher   @relation(fields: [createdBy], references: [id], onDelete: Cascade)
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
 }
 
 model Class {
