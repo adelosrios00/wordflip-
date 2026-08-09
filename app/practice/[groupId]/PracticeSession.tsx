@@ -145,10 +145,10 @@ export function PracticeSession({ words, studentId, groupId, groupName, groupTyp
     const target = phase === "type_en" ? word.english : word.spanish;
     if (normalize(typVal) === normalize(target)) {
       setTypCorrect(true);
-      setTimeout(() => { setTypVal(""); setTypCorrect(false); advance(); }, 450);
+      setTimeout(() => { setTypVal(""); setTypCorrect(false); advance(); }, 600);
     } else {
       setTypWrong(true);
-      setTimeout(() => { setTypWrong(false); setTypVal(""); typRef.current?.focus(); }, 800);
+      // Don't clear — let the student see and fix their answer
     }
   }
 
@@ -326,64 +326,108 @@ export function PracticeSession({ words, studentId, groupId, groupName, groupTyp
       )}
 
       {/* TYPING */}
-      {(phase === "type_en" || phase === "type_es") && (
-        <div>
-          <div className="flex justify-center mb-4">
-            <img src={word.imageUrl ?? FALLBACK_IMG} alt="" className="h-36 w-36 object-cover rounded-2xl shadow-md" />
-          </div>
-          <div className="text-center text-5xl font-bold text-gray-800 mb-3 leading-tight">
-            {phase === "type_en" ? word.spanish : word.english}
-          </div>
-          <p className="text-center text-xl text-gray-400 mb-8">
-            {phase === "type_en" ? "Escribe en inglés:" : "Escribe en español:"}
-          </p>
-          <form onSubmit={handleTypingSubmit} className="flex gap-3 max-w-md mx-auto">
-            <input
-              ref={typRef}
-              type="text"
-              value={typVal}
-              onChange={(e) => setTypVal(e.target.value)}
-              autoComplete="off"
-              autoCorrect="off"
-              spellCheck={false}
-              placeholder="..."
-              className={`flex-1 text-3xl font-bold border-4 rounded-2xl px-5 py-4 focus:outline-none text-center transition-all ${
-                typWrong ? "border-red-500 bg-red-50 text-red-700"
-                : typCorrect ? "border-green-500 bg-green-50 text-green-700"
-                : "border-gray-300 focus:border-blue-500 bg-white"
-              }`}
-            />
-            <button type="submit" className="text-2xl font-bold px-6 py-4 bg-green-500 text-white rounded-2xl hover:bg-green-600 active:scale-95 transition-all shadow-sm">
-              ✓
-            </button>
-          </form>
-          <div className="flex flex-wrap gap-2 justify-center mt-4 max-w-md mx-auto">
-            {specialChars.map((ch) => (
-              <button
-                key={ch}
-                type="button"
-                onMouseDown={(e) => {
-                  e.preventDefault();
-                  const input = typRef.current;
-                  if (!input) return;
-                  const start = input.selectionStart ?? typVal.length;
-                  const end = input.selectionEnd ?? typVal.length;
-                  const newVal = typVal.slice(0, start) + ch + typVal.slice(end);
-                  setTypVal(newVal);
-                  setTimeout(() => { input.focus(); input.setSelectionRange(start + 1, start + 1); }, 0);
-                }}
-                className="px-3 py-2 text-lg font-bold bg-gray-100 hover:bg-yellow-100 hover:border-yellow-400 rounded-xl border-2 border-gray-300 transition-all"
-              >
+      {(phase === "type_en" || phase === "type_es") && (() => {
+        const target = phase === "type_en" ? word.english : word.spanish;
+        const prompt = phase === "type_en" ? word.spanish : word.english;
+        const promptLen = prompt.length;
+        const promptSize = promptLen > 60 ? "text-lg" : promptLen > 35 ? "text-2xl" : promptLen > 20 ? "text-3xl" : "text-4xl";
+
+        // Character-by-character diff
+        function renderDiff(typed: string, correct: string) {
+          const norm = (s: string) => s.toLowerCase();
+          return correct.split("").map((ch, i) => {
+            const typedCh = typed[i] ?? "";
+            const ok = norm(typedCh) === norm(ch);
+            return (
+              <span key={i} className={ok ? "text-emerald-600" : "text-red-500 font-bold underline decoration-2"}>
                 {ch}
+              </span>
+            );
+          });
+        }
+
+        return (
+          <div>
+            <div className="flex justify-center mb-4">
+              <img src={word.imageUrl ?? FALLBACK_IMG} alt="" className="h-32 w-32 object-cover rounded-2xl shadow-md" />
+            </div>
+
+            {/* Prompt — always visible, size adapts to length */}
+            <div className={`text-center font-bold text-gray-800 mb-2 leading-snug break-words px-2 ${promptSize}`}>
+              {prompt}
+            </div>
+            <p className="text-center text-sm text-gray-400 mb-5">
+              {phase === "type_en" ? "Escribe en inglés" : "Escribe en español"}
+            </p>
+
+            <form onSubmit={handleTypingSubmit} className="flex gap-3 max-w-md mx-auto">
+              <input
+                ref={typRef}
+                type="text"
+                value={typVal}
+                onChange={(e) => {
+                  setTypVal(e.target.value);
+                  if (typWrong) setTypWrong(false);
+                }}
+                autoComplete="off"
+                autoCorrect="off"
+                spellCheck={false}
+                placeholder="Escribe aquí..."
+                className={`flex-1 text-xl font-semibold border-4 rounded-2xl px-5 py-4 focus:outline-none text-center transition-all ${
+                  typWrong ? "border-red-400 bg-red-50 text-red-700"
+                  : typCorrect ? "border-emerald-400 bg-emerald-50 text-emerald-700"
+                  : "border-gray-300 focus:border-blue-500 bg-white"
+                }`}
+              />
+              <button type="submit" className="text-2xl font-bold px-6 py-4 bg-emerald-500 text-white rounded-2xl hover:bg-emerald-600 active:scale-95 transition-all shadow-sm">
+                ✓
               </button>
-            ))}
+            </form>
+
+            {/* Special chars */}
+            <div className="flex flex-wrap gap-2 justify-center mt-3 max-w-md mx-auto">
+              {specialChars.map((ch) => (
+                <button
+                  key={ch}
+                  type="button"
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    const input = typRef.current;
+                    if (!input) return;
+                    const start = input.selectionStart ?? typVal.length;
+                    const end = input.selectionEnd ?? typVal.length;
+                    const newVal = typVal.slice(0, start) + ch + typVal.slice(end);
+                    setTypVal(newVal);
+                    if (typWrong) setTypWrong(false);
+                    setTimeout(() => { input.focus(); input.setSelectionRange(start + 1, start + 1); }, 0);
+                  }}
+                  className="px-3 py-2 text-base font-bold bg-gray-100 hover:bg-yellow-100 hover:border-yellow-400 rounded-xl border-2 border-gray-300 transition-all"
+                >
+                  {ch}
+                </button>
+              ))}
+            </div>
+
+            {/* Error feedback — stays visible, shows diff */}
+            {typWrong && (
+              <div className="mt-5 max-w-md mx-auto bg-red-50 border-2 border-red-200 rounded-2xl p-4">
+                <p className="text-red-600 font-bold text-sm mb-2 text-center">Incorrecto — corrige tu respuesta:</p>
+                <div className="text-center text-lg font-mono leading-relaxed break-words">
+                  {renderDiff(typVal, target)}
+                </div>
+                {typVal.length < target.length && (
+                  <p className="text-red-400 text-xs text-center mt-1">
+                    Faltan {target.length - typVal.length} caracteres
+                  </p>
+                )}
+              </div>
+            )}
+            {typCorrect && (
+              <p className="text-emerald-600 font-bold text-lg text-center mt-5">¡Correcto!</p>
+            )}
           </div>
-          <div className="text-center mt-5 h-8">
-            {typWrong && <p className="text-red-500 font-bold text-xl animate-pulse">✗ Try it again!</p>}
-            {typCorrect && <p className="text-green-500 font-bold text-xl">✓ ¡Correcto!</p>}
-          </div>
-        </div>
-      )}
+        );
+      })()}
     </div>
   );
 }
