@@ -10,11 +10,12 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     const { id: classId } = await params;
     const { wordGroupId } = await req.json();
 
-    await prisma.classWordGroup.upsert({
+    const existing = await prisma.classWordGroup.findUnique({
       where: { classId_wordGroupId: { classId, wordGroupId } },
-      update: {},
-      create: { classId, wordGroupId },
     });
+    if (!existing) {
+      await prisma.classWordGroup.create({ data: { classId, wordGroupId } });
+    }
 
     return NextResponse.json({ ok: true });
   } catch (e: unknown) {
