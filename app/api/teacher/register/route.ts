@@ -18,10 +18,8 @@ export async function POST(req: NextRequest) {
 
   const passwordHash = await bcrypt.hash(password, 10);
 
-  await prisma.$transaction([
-    prisma.teacher.create({ data: { username, passwordHash } }),
-    prisma.teacherInvite.update({ where: { code }, data: { usedAt: new Date() } }),
-  ]);
+  await prisma.teacherInvite.update({ where: { code }, data: { usedAt: new Date() } });
+  await prisma.teacher.create({ data: { username, passwordHash } });
 
   return NextResponse.json({ ok: true });
 }
