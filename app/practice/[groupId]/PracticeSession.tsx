@@ -35,11 +35,46 @@ function buildOptions(words: Word[], current: Word, field: "english" | "spanish"
 
 const FALLBACK_IMG = "/no-image.svg";
 
+const localKey = (sid: string, gid: string) => `wf_${sid}_${gid}`;
+
+function saveLocal(sid: string, gid: string, done: Set<string>) {
+  try { localStorage.setItem(localKey(sid, gid), JSON.stringify([...done])); } catch {}
+}
+
+function loadLocal(sid: string, gid: string): Set<string> {
+  try {
+    const raw = localStorage.getItem(localKey(sid, gid));
+    if (raw) return new Set(JSON.parse(raw) as string[]);
+  } catch {}
+  return new Set();
+}
+
 export function PracticeSession({ words, studentId, groupId, groupName, groupType, initialProgress }: Props) {
-  const buildDone = (p: { phase: string; wordId: string }[]) => new Set(p.map((x) => `${x.phase}:${x.wordId}`));
+  const buildDone = (p: { phase: string; wordId: string }[]) => {
+    const db = new Set(p.map((x) => `${x.phase}:${x.wordId}`));
+    const local = loadLocal(studentId, groupId);
+    return new Set([...db, ...local]);
+  };
 
   const [done, setDone] = useState(() => buildDone(initialProgress));
   const [showPreview, setShowPreview] = useState(true);
+
+  // On mount: sync any localStorage progress that isn't in the DB yet
+  useEffect(() => {
+    const local = loadLocal(studentId, groupId);
+    const db = new Set(initialProgress.map((x) => `${x.phase}:${x.wordId}`));
+    const missing = [...local].filter((k) => !db.has(k));
+    for (const key of missing) {
+      const [phase, wordId] = key.split(":");
+      fetch("/api/progress", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ studentId, wordGroupId: groupId, phase, wordId }),
+        keepalive: true,
+      }).catch(() => {});
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   function getNext(d: Set<string>) {
     for (const p of PHASES) {
@@ -99,11 +134,15 @@ export function PracticeSession({ words, studentId, groupId, groupName, groupTyp
     const newDone = new Set(done);
     newDone.add(key);
     setDone(newDone);
+    // Save locally first (instant, reliable)
+    saveLocal(studentId, groupId, newDone);
+    // Also send to DB (may fail silently on Neon cold start)
     fetch("/api/progress", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ studentId, wordGroupId: groupId, phase, wordId: word.id }),
-    }).catch(console.error);
+      keepalive: true,
+    }).catch(() => {});
     const { phase: np, idx: ni } = getNext(newDone);
     setPhase(np);
     setWordIdx(ni);
