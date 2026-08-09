@@ -64,7 +64,7 @@ export default async function AdminPage() {
                   </span>
                 </div>
                 <p className="text-gray-500">
-                  {group._count.words} / {group.groupType === "phrases" ? 5 : 10}
+                  {group._count.words} / 10
                   {group.groupType === "phrases" ? " frases" : " palabras"}
                 </p>
               </div>

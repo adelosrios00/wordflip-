@@ -25,13 +25,13 @@ export default function NewGroupPage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
-  const slots = groupType === "words" ? 10 : 5;
+  const slots = 10;
   const isWords = groupType === "words";
 
   function handleTypeChange(t: GroupType) {
     setGroupType(t);
     // Reset slots to match new type
-    setWords(Array.from({ length: t === "words" ? 10 : 5 }, emptyWord));
+    setWords(Array.from({ length: 10 }, emptyWord));
   }
 
   function updateWord(index: number, field: keyof WordEntry, value: string | File | null) {
@@ -103,7 +103,7 @@ export default function NewGroupPage() {
               }`}
             >
               💬 Frases
-              <span className="block text-sm font-normal mt-1 opacity-70">5 frases · con imagen</span>
+              <span className="block text-sm font-normal mt-1 opacity-70">10 frases · con imagen</span>
             </button>
           </div>
         </div>

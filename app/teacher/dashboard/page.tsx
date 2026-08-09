@@ -115,7 +115,7 @@ export default async function TeacherDashboard() {
                   <span className="font-medium text-slate-800">{g.name}</span>
                 </div>
                 <span className="text-slate-400 text-xs">
-                  {g._count.words} / {g.groupType === "phrases" ? 5 : 10}
+                  {g._count.words} / 10
                 </span>
               </div>
             ))}

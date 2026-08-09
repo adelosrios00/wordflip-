@@ -202,7 +202,7 @@ export function PracticeSession({ words, studentId, groupId, groupName, groupTyp
     setWordIdx(0);
   }
 
-  const specialChars = ["á", "é", "í", "ó", "ú", "ñ", ...(groupType === "phrases" ? ["Á", "É", "Í", "Ó", "Ú", "Ñ"] : [])];
+  const specialChars = ["á", "é", "í", "ó", "ú", "ñ", "Á", "É", "Í", "Ó", "Ú", "Ñ", "¿", "?", "¡", "!"];
 
   // ── PREVIEW ──
   if (showPreview) {
