@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 
 function ChevronRight() {
   return (
@@ -30,13 +31,16 @@ export default function Home() {
     <main className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-6">
       <div className="w-full max-w-xs">
         <div className="text-center mb-12">
-          <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-blue-600 mb-5">
-            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4" />
-            </svg>
+          <div className="flex justify-center mb-4">
+            <Image
+              src="/logo.png"
+              alt="WordFlip"
+              width={140}
+              height={140}
+              priority
+              style={{ borderRadius: 28 }}
+            />
           </div>
-          <h1 className="text-3xl font-extrabold tracking-tight text-slate-900">WordFlip</h1>
-          <p className="text-slate-400 text-sm mt-1.5 font-medium tracking-widest uppercase">Español · English</p>
         </div>
 
         <div className="flex flex-col gap-3">
@@ -77,8 +81,8 @@ export default function Home() {
           </Link>
         </div>
 
-        <p className="text-center text-slate-400 text-xs mt-10">
-          WordFlip · Vocabulario ES ↔ EN
+        <p className="text-center text-slate-300 text-xs mt-10 font-semibold tracking-widest uppercase">
+          Vocabulario ES · EN
         </p>
       </div>
     </main>
