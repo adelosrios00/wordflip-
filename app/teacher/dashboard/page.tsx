@@ -137,9 +137,10 @@ export default async function TeacherDashboard() {
           ) : (
             <div className="flex flex-col gap-2">
               {wordGroups.map((g) => (
-                <div
+                <Link
                   key={g.id}
-                  className="flex items-center justify-between bg-white rounded-2xl px-5 py-4 shadow-sm border border-slate-100"
+                  href={`/admin/groups/${g.id}`}
+                  className="group flex items-center justify-between bg-white rounded-2xl px-5 py-4 shadow-sm border border-slate-100 hover:border-emerald-300 hover:shadow-md transition-all"
                 >
                   <div className="flex items-center gap-3">
                     <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${
@@ -162,14 +163,19 @@ export default async function TeacherDashboard() {
                       </p>
                     </div>
                   </div>
-                  <span className={`text-xs font-bold px-3 py-1 rounded-full ${
-                    g.groupType === "phrases"
-                      ? "bg-violet-50 text-violet-600"
-                      : "bg-blue-50 text-blue-600"
-                  }`}>
-                    {g.groupType === "phrases" ? "Frases" : "Palabras"}
-                  </span>
-                </div>
+                  <div className="flex items-center gap-2">
+                    <span className={`text-xs font-bold px-3 py-1 rounded-full ${
+                      g.groupType === "phrases"
+                        ? "bg-violet-50 text-violet-600"
+                        : "bg-blue-50 text-blue-600"
+                    }`}>
+                      {g.groupType === "phrases" ? "Frases" : "Palabras"}
+                    </span>
+                    <svg className="w-4 h-4 text-slate-300 group-hover:text-emerald-500 group-hover:translate-x-0.5 transition-all" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 18l6-6-6-6" />
+                    </svg>
+                  </div>
+                </Link>
               ))}
             </div>
           )}

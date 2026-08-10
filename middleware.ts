@@ -25,6 +25,14 @@ export function middleware(request: NextRequest) {
     if (!session?.value) return NextResponse.redirect(new URL("/teacher/login", request.url));
   }
 
+  // Superadmin routes
+  if (pathname.startsWith("/superadmin") && pathname !== "/superadmin/login") {
+    const session = request.cookies.get("superadmin_session");
+    if (!session?.value) {
+      return NextResponse.redirect(new URL("/superadmin/login", request.url));
+    }
+  }
+
   // Student routes
   if (pathname === "/home" || pathname.startsWith("/practice/")) {
     const session = request.cookies.get("student_session");
@@ -37,5 +45,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/teacher/:path*", "/admin/:path*", "/admin", "/home", "/practice/:path*"],
+  matcher: ["/teacher/:path*", "/admin/:path*", "/admin", "/home", "/practice/:path*", "/superadmin/:path*", "/superadmin"],
 };
