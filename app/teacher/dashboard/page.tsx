@@ -4,7 +4,6 @@ import { getTeacher } from "@/app/lib/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { LogoutTeacherButton } from "./LogoutTeacherButton";
-import { InviteButton } from "./InviteButton";
 
 export default async function TeacherDashboard() {
   const teacher = await getTeacher();
@@ -61,15 +60,6 @@ export default async function TeacherDashboard() {
 
       {/* Content card over header */}
       <div className="max-w-2xl mx-auto px-6" style={{ marginTop: -24 }}>
-
-        {/* Invitar profesor */}
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 px-5 py-4 mb-4 flex items-center justify-between">
-          <div>
-            <p className="font-bold text-slate-800 text-sm">Invitar otro profesor</p>
-            <p className="text-slate-400 text-xs mt-0.5">Genera un enlace de acceso único</p>
-          </div>
-          <InviteButton />
-        </div>
 
         {/* Mis clases */}
         <section className="mb-4">
