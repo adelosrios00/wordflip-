@@ -8,7 +8,7 @@ export function LogoutStudentButton() {
     router.push("/");
   }
   return (
-    <button onClick={handle} className="text-sm text-gray-400 hover:text-red-500 transition-colors">
+    <button onClick={handle} className="text-sm text-blue-200 hover:text-white font-semibold transition-colors">
       Cerrar sesión
     </button>
   );
