@@ -28,22 +28,37 @@ function TeacherIcon() {
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-6">
-      <div className="w-full max-w-xs">
-        <div className="text-center mb-12">
-          <div className="flex justify-center mb-4">
-            <Image
-              src="/logo.png"
-              alt="WordFlip"
-              width={140}
-              height={140}
-              priority
-              style={{ borderRadius: 28 }}
-            />
-          </div>
-        </div>
+    <main className="min-h-screen flex flex-col" style={{ background: "#ffffff" }}>
+      {/* Hero azul integrado */}
+      <div
+        className="flex flex-col items-center justify-center pt-16 pb-12 px-6"
+        style={{
+          background: "linear-gradient(160deg, #1d4ed8 0%, #2563eb 50%, #3b82f6 100%)",
+        }}
+      >
+        <Image
+          src="/logo.png"
+          alt="WordFlip"
+          width={180}
+          height={180}
+          priority
+          style={{ borderRadius: 32, boxShadow: "0 8px 32px rgba(0,0,0,0.18)" }}
+        />
+        <p className="text-blue-200 text-xs mt-5 font-bold tracking-widest uppercase">
+          Vocabulario ES · EN
+        </p>
+      </div>
 
-        <div className="flex flex-col gap-3">
+      {/* Curva de transición */}
+      <div style={{ marginTop: -2 }}>
+        <svg viewBox="0 0 1440 60" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ display: "block", width: "100%" }}>
+          <path d="M0 0 Q720 60 1440 0 L1440 60 L0 60 Z" fill="#ffffff" />
+        </svg>
+      </div>
+
+      {/* Botones de acceso */}
+      <div className="flex flex-col items-center px-6 pb-10" style={{ background: "#ffffff", marginTop: -8 }}>
+        <div className="w-full max-w-xs flex flex-col gap-3 mt-2">
           <Link
             href="/student/login"
             className="group flex items-center justify-between bg-white border border-slate-200 rounded-2xl p-5 hover:border-blue-300 hover:shadow-md transition-all duration-200"
@@ -53,7 +68,7 @@ export default function Home() {
                 <StudentIcon />
               </div>
               <div>
-                <p className="font-semibold text-slate-800">Acceso alumnos</p>
+                <p className="font-bold text-slate-800">Acceso alumnos</p>
                 <p className="text-slate-400 text-xs mt-0.5">Entra con tu usuario y contraseña</p>
               </div>
             </div>
@@ -71,7 +86,7 @@ export default function Home() {
                 <TeacherIcon />
               </div>
               <div>
-                <p className="font-semibold text-slate-800">Acceso profesores</p>
+                <p className="font-bold text-slate-800">Acceso profesores</p>
                 <p className="text-slate-400 text-xs mt-0.5">Gestiona tus clases y grupos</p>
               </div>
             </div>
@@ -80,10 +95,6 @@ export default function Home() {
             </span>
           </Link>
         </div>
-
-        <p className="text-center text-slate-300 text-xs mt-10 font-semibold tracking-widest uppercase">
-          Vocabulario ES · EN
-        </p>
       </div>
     </main>
   );
