@@ -36,6 +36,7 @@ model Class {
 model ClassWordGroup {
   classId     String
   wordGroupId String
+  deadline    DateTime?
   class       Class     @relation(fields: [classId], references: [id], onDelete: Cascade)
   wordGroup   WordGroup @relation(fields: [wordGroupId], references: [id], onDelete: Cascade)
   @@id([classId, wordGroupId])
@@ -55,13 +56,14 @@ model Word {
 }
 
 model WordGroup {
-  id        String           @id @default(cuid())
-  name      String
-  order     Int              @unique
-  groupType String           @default("words") @map("type")
-  words     Word[]
-  progress  Progress[]
-  classes   ClassWordGroup[]
+  id         String           @id @default(cuid())
+  name       String
+  order      Int              @unique
+  groupType  String           @default("words") @map("type")
+  targetLang String           @default("en")
+  words      Word[]
+  progress   Progress[]
+  classes    ClassWordGroup[]
 }
 
 model Student {

@@ -24,6 +24,7 @@ export async function POST(req: NextRequest) {
     const formData = await req.formData();
     const name = formData.get("name") as string;
     const groupType = (formData.get("type") as string) || "words";
+    const targetLang = (formData.get("targetLang") as string) || "en";
     const wordCount = parseInt(formData.get("wordCount") as string, 10);
 
     const lastGroup = await prisma.wordGroup.findFirst({
@@ -32,7 +33,7 @@ export async function POST(req: NextRequest) {
     const nextOrder = (lastGroup?.order ?? 0) + 1;
 
     const group = await prisma.wordGroup.create({
-      data: { name, groupType, order: nextOrder },
+      data: { name, groupType, targetLang, order: nextOrder },
     });
 
     for (let i = 0; i < wordCount; i++) {

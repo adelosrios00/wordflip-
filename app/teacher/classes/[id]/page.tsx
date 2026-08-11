@@ -28,6 +28,10 @@ export default async function ClassPage({ params }: { params: Promise<{ id: stri
   if (!cls || cls.teacherId !== teacher.id) redirect("/teacher/dashboard");
 
   const assignedIds = new Set(cls.groups.map((g) => g.wordGroupId));
+  const deadlines: Record<string, string | null> = {};
+  for (const g of cls.groups) {
+    deadlines[g.wordGroupId] = g.deadline ? g.deadline.toISOString() : null;
+  }
 
   const allProgress = cls.students.length > 0 && cls.groups.length > 0
     ? await prisma.progress.groupBy({
@@ -150,7 +154,7 @@ export default async function ClassPage({ params }: { params: Promise<{ id: stri
       {/* Assign groups */}
       <section>
         <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-widest mb-3">Grupos asignados</h2>
-        <ClassGroupsManager classId={id} allGroups={allGroups} assignedIds={[...assignedIds]} />
+        <ClassGroupsManager classId={id} allGroups={allGroups} assignedIds={[...assignedIds]} deadlines={deadlines} />
       </section>
     </main>
   );

@@ -243,18 +243,57 @@ export function PracticeSession({ words, studentId, groupId, groupName, groupTyp
   // ── COMPLETE ──
   if (phase === "complete") {
     return (
-      <div className="max-w-lg mx-auto text-center py-20 px-8">
-        <div className="text-9xl mb-6">🎉</div>
-        <h1 className="text-5xl font-bold text-green-600 mb-4">¡Felicidades!</h1>
-        <p className="text-3xl font-semibold text-gray-700 mb-2">100% completado</p>
-        <p className="text-xl text-gray-500 mb-10">{groupName}</p>
-        <Link href="/home" className="inline-block text-xl font-bold px-10 py-5 bg-green-500 text-white rounded-2xl hover:bg-green-600 transition-all shadow-md">
-          ← Volver a mis grupos
-        </Link>
-        <div className="mt-4">
-          <button onClick={handleRestart} className="text-gray-400 hover:text-gray-600 text-base underline">
-            Volver a empezar desde cero
-          </button>
+      <div className="relative max-w-lg mx-auto text-center py-20 px-8 overflow-hidden">
+        {/* Confetti */}
+        <div className="pointer-events-none fixed inset-0 z-50 overflow-hidden">
+          {Array.from({ length: 60 }).map((_, i) => {
+            const colors = ["#2563eb","#7c3aed","#10b981","#f59e0b","#ef4444","#ec4899"];
+            const color = colors[i % colors.length];
+            const left = `${(i * 7 + 13) % 100}%`;
+            const delay = `${(i * 0.08).toFixed(2)}s`;
+            const dur = `${1.2 + (i % 5) * 0.3}s`;
+            const size = 6 + (i % 4) * 4;
+            return (
+              <div
+                key={i}
+                style={{
+                  position: "absolute",
+                  left,
+                  top: "-20px",
+                  width: size,
+                  height: size,
+                  background: color,
+                  borderRadius: i % 3 === 0 ? "50%" : "2px",
+                  animation: `confettiFall ${dur} ${delay} ease-in forwards`,
+                  transform: `rotate(${i * 37}deg)`,
+                }}
+              />
+            );
+          })}
+        </div>
+        <style>{`
+          @keyframes confettiFall {
+            0%   { transform: translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+          }
+        `}</style>
+        <div className="relative z-10">
+          <div className="w-24 h-24 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-6">
+            <svg className="w-12 h-12 text-emerald-600" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
+          <h1 className="text-4xl font-black text-slate-800 mb-2">¡Completado!</h1>
+          <p className="text-emerald-600 font-bold text-xl mb-1">100% · {groupName}</p>
+          <p className="text-slate-400 text-sm mb-10">Has dominado todas las palabras de este grupo</p>
+          <Link href="/home" className="inline-block font-black px-10 py-4 bg-blue-600 text-white rounded-2xl hover:bg-blue-700 transition-all shadow-md text-lg">
+            ← Volver a mis grupos
+          </Link>
+          <div className="mt-5">
+            <button onClick={handleRestart} className="text-slate-400 hover:text-slate-600 text-sm underline">
+              Volver a empezar desde cero
+            </button>
+          </div>
         </div>
       </div>
     );

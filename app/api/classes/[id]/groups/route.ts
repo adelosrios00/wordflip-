@@ -8,13 +8,20 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     if (!teacher) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
 
     const { id: classId } = await params;
-    const { wordGroupId } = await req.json();
+    const { wordGroupId, deadline } = await req.json();
 
     const existing = await prisma.classWordGroup.findUnique({
       where: { classId_wordGroupId: { classId, wordGroupId } },
     });
     if (!existing) {
-      await prisma.classWordGroup.create({ data: { classId, wordGroupId } });
+      await prisma.classWordGroup.create({
+        data: { classId, wordGroupId, deadline: deadline ? new Date(deadline) : null },
+      });
+    } else if (deadline !== undefined) {
+      await prisma.classWordGroup.update({
+        where: { classId_wordGroupId: { classId, wordGroupId } },
+        data: { deadline: deadline ? new Date(deadline) : null },
+      });
     }
 
     return NextResponse.json({ ok: true });

@@ -6,6 +6,14 @@ import Link from "next/link";
 
 type GroupType = "words" | "phrases";
 
+const LANGS = [
+  { code: "en", label: "Inglés", flag: "🇬🇧" },
+  { code: "fr", label: "Francés", flag: "🇫🇷" },
+  { code: "de", label: "Alemán", flag: "🇩🇪" },
+  { code: "it", label: "Italiano", flag: "🇮🇹" },
+  { code: "pt", label: "Portugués", flag: "🇵🇹" },
+];
+
 interface WordEntry {
   spanish: string;
   english: string;
@@ -20,6 +28,7 @@ function emptyWord(): WordEntry {
 export default function NewGroupPage() {
   const router = useRouter();
   const [groupType, setGroupType] = useState<GroupType>("words");
+  const [targetLang, setTargetLang] = useState("en");
   const [groupName, setGroupName] = useState("");
   const [words, setWords] = useState<WordEntry[]>(Array.from({ length: 5 }, emptyWord));
   const [saving, setSaving] = useState(false);
@@ -59,6 +68,7 @@ export default function NewGroupPage() {
     const formData = new FormData();
     formData.append("name", groupName.trim());
     formData.append("type", groupType);
+    formData.append("targetLang", targetLang);
     formData.append("wordCount", String(filled.length));
     filled.forEach((w, i) => {
       formData.append(`word_${i}_spanish`, w.spanish.trim());
@@ -108,6 +118,27 @@ export default function NewGroupPage() {
           </div>
         </div>
 
+        {/* Idioma objetivo */}
+        <div className="mb-7">
+          <label className="block text-sm font-semibold text-slate-500 uppercase tracking-widest mb-3">Idioma a practicar</label>
+          <div className="flex flex-wrap gap-2">
+            {LANGS.map((l) => (
+              <button
+                key={l.code}
+                type="button"
+                onClick={() => setTargetLang(l.code)}
+                className={`px-4 py-2 rounded-xl border-2 font-bold text-sm transition-all ${
+                  targetLang === l.code
+                    ? "border-blue-500 bg-blue-50 text-blue-700"
+                    : "border-slate-200 bg-white text-slate-500 hover:border-slate-300"
+                }`}
+              >
+                {l.flag} {l.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
         {/* Group name */}
         <div className="mb-7">
           <label className="block text-sm font-semibold text-slate-500 uppercase tracking-widest mb-2">Nombre del grupo</label>
@@ -150,12 +181,14 @@ export default function NewGroupPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-500 mb-1">English</label>
+                  <label className="block text-xs font-semibold text-slate-500 mb-1">
+                    {LANGS.find((l) => l.code === targetLang)?.label ?? "Idioma"}
+                  </label>
                   <input
                     type="text"
                     value={w.english}
                     onChange={(e) => updateWord(i, "english", e.target.value)}
-                    placeholder={isWords ? "word in English" : "phrase in English"}
+                    placeholder={isWords ? `palabra en ${LANGS.find(l=>l.code===targetLang)?.label}` : `frase en ${LANGS.find(l=>l.code===targetLang)?.label}`}
                     className="w-full border border-slate-200 rounded-lg px-3 py-2 text-slate-900 placeholder:text-slate-400 focus:border-blue-400 focus:ring-1 focus:ring-blue-100 outline-none text-sm"
                   />
                 </div>
