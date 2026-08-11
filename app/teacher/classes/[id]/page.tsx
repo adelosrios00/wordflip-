@@ -4,6 +4,7 @@ import { getTeacher } from "@/app/lib/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { ClassGroupsManager } from "./ClassGroupsManager";
+import { StudentManager } from "./StudentManager";
 
 export default async function ClassPage({ params }: { params: Promise<{ id: string }> }) {
   const teacher = await getTeacher();
@@ -44,9 +45,7 @@ export default async function ClassPage({ params }: { params: Promise<{ id: stri
       })
     : [];
 
-  const progressMap = new Map(
-    allProgress.map((p) => [`${p.studentId}:${p.wordGroupId}`, p._count._all])
-  );
+  const progressMap = new Map(allProgress.map((p) => [`${p.studentId}:${p.wordGroupId}`, p._count._all]));
 
   function getMastery(studentId: string, groupId: string, wordCount: number) {
     const count = progressMap.get(`${studentId}:${groupId}`) ?? 0;
@@ -55,58 +54,52 @@ export default async function ClassPage({ params }: { params: Promise<{ id: stri
 
   return (
     <main className="max-w-3xl mx-auto px-6 py-10">
-      <div className="flex items-center gap-3 mb-8">
-        <Link href="/teacher/dashboard" className="text-slate-400 hover:text-slate-600 transition-colors">
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M15 18l-6-6 6-6" />
-          </svg>
-        </Link>
-        <div>
-          <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest">Clase</p>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">{cls.name}</h1>
+      <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center gap-3">
+          <Link href="/teacher/dashboard" className="text-slate-400 hover:text-slate-600 transition-colors">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 18l-6-6 6-6" />
+            </svg>
+          </Link>
+          <div>
+            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Clase</p>
+            <h1 className="text-2xl font-black tracking-tight text-slate-900">{cls.name}</h1>
+          </div>
         </div>
+        <a
+          href={`/api/classes/${id}/export`}
+          className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white font-bold rounded-xl hover:bg-emerald-700 transition-all text-sm shadow-sm"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          Exportar CSV
+        </a>
       </div>
 
-      {/* Student credentials */}
+      {/* Alumnos */}
       <section className="mb-10">
-        <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-widest mb-3">Alumnos y credenciales</h2>
-        <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="bg-slate-50 border-b border-slate-200">
-                <th className="px-5 py-3 text-left font-semibold text-slate-500">Alumno</th>
-                <th className="px-5 py-3 text-left font-semibold text-slate-500">Usuario</th>
-                <th className="px-5 py-3 text-left font-semibold text-slate-500">Contraseña</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {cls.students.map((s) => (
-                <tr key={s.id}>
-                  <td className="px-5 py-3.5 font-medium text-slate-800">{s.name}</td>
-                  <td className="px-5 py-3.5 font-mono text-blue-600 font-semibold">{s.username ?? "—"}</td>
-                  <td className="px-5 py-3.5 font-mono text-emerald-600 font-semibold">{s.password ?? "—"}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <h2 className="text-sm font-bold text-slate-500 uppercase tracking-widest mb-3">Alumnos</h2>
+        <StudentManager classId={id} initial={cls.students.map((s) => ({
+          id: s.id, name: s.name, username: s.username ?? null, password: s.password ?? null,
+        }))} />
       </section>
 
-      {/* Results */}
+      {/* Resultados */}
       {cls.students.length > 0 && cls.groups.length > 0 && (
         <section className="mb-10">
-          <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-widest mb-3">Resultados</h2>
+          <h2 className="text-sm font-bold text-slate-500 uppercase tracking-widest mb-3">Resultados</h2>
           <div className="bg-white border border-slate-200 rounded-2xl overflow-x-auto shadow-sm">
             <table className="w-full text-sm">
               <thead>
                 <tr className="bg-slate-50 border-b border-slate-200">
-                  <th className="px-5 py-3 text-left font-semibold text-slate-500">Alumno</th>
+                  <th className="px-5 py-3 text-left font-bold text-slate-500">Alumno</th>
                   {cls.groups.map((g) => (
-                    <th key={g.wordGroupId} className="px-4 py-3 text-center font-semibold text-slate-500 whitespace-nowrap">
+                    <th key={g.wordGroupId} className="px-4 py-3 text-center font-bold text-slate-500 whitespace-nowrap">
                       {g.wordGroup.name}
                     </th>
                   ))}
-                  <th className="px-5 py-3 text-center font-semibold text-slate-500">Total</th>
+                  <th className="px-5 py-3 text-center font-bold text-slate-500">Media</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
@@ -117,10 +110,9 @@ export default async function ClassPage({ params }: { params: Promise<{ id: stri
                   const avg = masteries.length > 0
                     ? Math.round(masteries.reduce((a, b) => a + b, 0) / masteries.length)
                     : 0;
-
                   return (
                     <tr key={s.id}>
-                      <td className="px-5 py-3.5 font-semibold text-slate-800 whitespace-nowrap">{s.name}</td>
+                      <td className="px-5 py-3.5 font-bold text-slate-800 whitespace-nowrap">{s.name}</td>
                       {cls.groups.map((g, i) => {
                         const pct = masteries[i];
                         return (
@@ -151,9 +143,9 @@ export default async function ClassPage({ params }: { params: Promise<{ id: stri
         </section>
       )}
 
-      {/* Assign groups */}
+      {/* Grupos asignados */}
       <section>
-        <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-widest mb-3">Grupos asignados</h2>
+        <h2 className="text-sm font-bold text-slate-500 uppercase tracking-widest mb-3">Grupos asignados</h2>
         <ClassGroupsManager classId={id} allGroups={allGroups} assignedIds={[...assignedIds]} deadlines={deadlines} />
       </section>
     </main>

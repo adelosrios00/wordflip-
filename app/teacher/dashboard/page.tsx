@@ -4,6 +4,7 @@ import { getTeacher } from "@/app/lib/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { LogoutTeacherButton } from "./LogoutTeacherButton";
+import { DuplicateGroupButton } from "./DuplicateGroupButton";
 
 export default async function TeacherDashboard() {
   const teacher = await getTeacher();
@@ -153,7 +154,7 @@ export default async function TeacherDashboard() {
                       </p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1">
                     <span className={`text-xs font-bold px-3 py-1 rounded-full ${
                       g.groupType === "phrases"
                         ? "bg-violet-50 text-violet-600"
@@ -161,6 +162,7 @@ export default async function TeacherDashboard() {
                     }`}>
                       {g.groupType === "phrases" ? "Frases" : "Palabras"}
                     </span>
+                    <DuplicateGroupButton groupId={g.id} />
                     <svg className="w-4 h-4 text-slate-300 group-hover:text-emerald-500 group-hover:translate-x-0.5 transition-all" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M9 18l6-6-6-6" />
                     </svg>
