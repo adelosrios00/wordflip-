@@ -78,15 +78,6 @@ export default async function ClassPage({ params }: { params: Promise<{ id: stri
             <h1 className="text-2xl font-black tracking-tight text-slate-900">{cls.name}</h1>
           </div>
         </div>
-        <a
-          href={`/api/classes/${id}/export`}
-          className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white font-bold rounded-xl hover:bg-emerald-700 transition-all text-sm shadow-sm"
-        >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-          </svg>
-          Exportar CSV
-        </a>
       </div>
 
       {/* Alumnos */}
