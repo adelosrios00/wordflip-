@@ -33,6 +33,15 @@ export function middleware(request: NextRequest) {
     }
   }
 
+  // Teacher demo preview — requires teacher session, not student
+  if (pathname.match(/^\/practice\/[^/]+\/demo$/)) {
+    const session = request.cookies.get("teacher_session");
+    if (!session?.value) {
+      return NextResponse.redirect(new URL("/teacher/login", request.url));
+    }
+    return NextResponse.next();
+  }
+
   // Student routes
   if (pathname === "/home" || pathname.startsWith("/practice/")) {
     const session = request.cookies.get("student_session");
