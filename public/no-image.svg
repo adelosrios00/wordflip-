@@ -4,5 +4,5 @@
   <circle cx="150" cy="138" r="28" fill="#9ca3af"/>
   <circle cx="150" cy="138" r="16" fill="#f3f4f6"/>
   <circle cx="125" cy="108" r="8" fill="#e5e7eb"/>
-  <text x="150" y="228" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="#9ca3af" text-anchor="middle">Sin imagen</text>
+  <text x="150" y="228" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="#9ca3af" text-anchor="middle">No image</text>
 </svg>

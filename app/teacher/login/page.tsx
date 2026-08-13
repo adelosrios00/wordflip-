@@ -31,7 +31,7 @@ export default function TeacherLogin() {
       router.push("/teacher/dashboard");
     } else {
       const d = await res.json();
-      setError(d.error || "Error al iniciar sesión");
+      setError(d.error || "Incorrect username or password");
       setLoading(false);
     }
   }
@@ -44,7 +44,7 @@ export default function TeacherLogin() {
             <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M15 18l-6-6 6-6" />
             </svg>
-            Volver
+            Back
           </Link>
           <div className="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm text-center">
             <div className="w-12 h-12 rounded-2xl bg-violet-50 flex items-center justify-center text-violet-600 mx-auto mb-5">
@@ -52,13 +52,13 @@ export default function TeacherLogin() {
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
               </svg>
             </div>
-            <h1 className="text-xl font-bold text-slate-900 mb-2">Primera vez aquí</h1>
-            <p className="text-slate-500 text-sm mb-6">Crea tu cuenta de profesor para empezar a gestionar clases y alumnos.</p>
+            <h1 className="text-xl font-bold text-slate-900 mb-2">First time here</h1>
+            <p className="text-slate-500 text-sm mb-6">Create your teacher account to start managing classes and students.</p>
             <Link
               href="/teacher/setup"
               className="block w-full py-2.5 bg-violet-600 text-white font-semibold rounded-xl hover:bg-violet-700 transition-all text-sm"
             >
-              Crear cuenta de profesor
+              Create teacher account
             </Link>
           </div>
         </div>
@@ -73,30 +73,30 @@ export default function TeacherLogin() {
           <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" d="M15 18l-6-6 6-6" />
           </svg>
-          Volver
+          Back
         </Link>
 
         <div className="mb-7">
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">Acceso profesores</h1>
-          <p className="text-slate-500 text-sm mt-1">Inicia sesión para gestionar tus clases</p>
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900">Teacher access</h1>
+          <p className="text-slate-500 text-sm mt-1">Sign in to manage your classes</p>
         </div>
 
         <div className="bg-white border border-slate-200 rounded-2xl p-7 shadow-sm">
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1.5">Usuario</label>
+              <label className="block text-sm font-medium text-slate-700 mb-1.5">Username</label>
               <input
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                placeholder="usuario"
+                placeholder="username"
                 required
                 autoFocus
                 className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-slate-900 placeholder:text-slate-400 focus:border-violet-500 focus:ring-2 focus:ring-violet-100 outline-none transition-all bg-slate-50 text-sm"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1.5">Contraseña</label>
+              <label className="block text-sm font-medium text-slate-700 mb-1.5">Password</label>
               <input
                 type="password"
                 value={password}
@@ -116,7 +116,7 @@ export default function TeacherLogin() {
               disabled={loading}
               className="w-full py-2.5 bg-violet-600 text-white font-semibold rounded-xl hover:bg-violet-700 disabled:opacity-50 transition-all text-sm mt-1"
             >
-              {loading ? "Entrando..." : "Entrar"}
+              {loading ? "Signing in..." : "Sign in"}
             </button>
           </form>
         </div>
