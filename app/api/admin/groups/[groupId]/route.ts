@@ -67,3 +67,13 @@ export async function PUT(req: NextRequest, { params }: Params) {
     return NextResponse.json({ error: "Error al actualizar" }, { status: 500 });
   }
 }
+
+export async function DELETE(_req: NextRequest, { params }: Params) {
+  const { groupId } = await params;
+  // Delete progress, words, class assignments, then the group
+  await prisma.progress.deleteMany({ where: { wordGroupId: groupId } });
+  await prisma.word.deleteMany({ where: { groupId } });
+  await prisma.classWordGroup.deleteMany({ where: { wordGroupId: groupId } });
+  await prisma.wordGroup.delete({ where: { id: groupId } });
+  return NextResponse.json({ ok: true });
+}

@@ -6,6 +6,7 @@ import Link from "next/link";
 import { LogoutTeacherButton } from "./LogoutTeacherButton";
 import { DuplicateGroupButton } from "./DuplicateGroupButton";
 import { PreviewGroupButton } from "./PreviewGroupButton";
+import { DeleteGroupButton } from "./DeleteGroupButton";
 
 export default async function TeacherDashboard() {
   const teacher = await getTeacher();
@@ -165,6 +166,7 @@ export default async function TeacherDashboard() {
                     </span>
                     <PreviewGroupButton groupId={g.id} />
                     <DuplicateGroupButton groupId={g.id} />
+                    <DeleteGroupButton groupId={g.id} groupName={g.name} />
                     <svg className="w-4 h-4 text-slate-300 group-hover:text-emerald-500 group-hover:translate-x-0.5 transition-all" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M9 18l6-6-6-6" />
                     </svg>
