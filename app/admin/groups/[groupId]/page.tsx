@@ -25,9 +25,7 @@ export default function EditGroupPage({ params }: Props) {
   const router = useRouter();
   const [groupId, setGroupId] = useState("");
   const [groupName, setGroupName] = useState("");
-  const [words, setWords] = useState<WordEntry[]>(
-    Array.from({ length: 10 }, emptyWord)
-  );
+  const [words, setWords] = useState<WordEntry[]>([]);
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -47,8 +45,8 @@ export default function EditGroupPage({ params }: Props) {
             imagePreview: null,
             existingImageUrl: w.imageUrl,
           }));
-          while (loaded.length < 10) loaded.push(emptyWord());
-          setWords(loaded);
+          // Start with existing words; if none yet, show 5 empty slots
+          setWords(loaded.length > 0 ? loaded : Array.from({ length: 5 }, emptyWord));
           setLoading(false);
         });
     });
@@ -58,16 +56,20 @@ export default function EditGroupPage({ params }: Props) {
     setWords((prev) => {
       const next = [...prev];
       if (field === "image" && value instanceof File) {
-        next[index] = {
-          ...next[index],
-          image: value,
-          imagePreview: URL.createObjectURL(value),
-        };
+        next[index] = { ...next[index], image: value, imagePreview: URL.createObjectURL(value) };
       } else {
         next[index] = { ...next[index], [field]: value as string };
       }
       return next;
     });
+  }
+
+  function addWord() {
+    setWords((prev) => [...prev, emptyWord()]);
+  }
+
+  function removeWord(index: number) {
+    setWords((prev) => prev.filter((_, i) => i !== index));
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -98,7 +100,7 @@ export default function EditGroupPage({ params }: Props) {
     });
 
     if (res.ok) {
-      router.push("/admin");
+      router.push("/teacher/dashboard");
     } else {
       const data = await res.json();
       setError(data.error || "Error al guardar");
@@ -118,7 +120,7 @@ export default function EditGroupPage({ params }: Props) {
     <main className="max-w-3xl mx-auto p-8">
       <div className="flex items-center justify-between mb-8">
         <h1 className="text-3xl font-bold text-gray-800">Editar grupo</h1>
-        <Link href="/admin" className="text-gray-500 hover:text-gray-700">
+        <Link href="/teacher/dashboard" className="text-gray-500 hover:text-gray-700">
           ← Cancelar
         </Link>
       </div>
@@ -138,18 +140,23 @@ export default function EditGroupPage({ params }: Props) {
 
         <div className="flex flex-col gap-4">
           {words.map((word, i) => (
-            <div
-              key={i}
-              className="bg-white border-2 border-gray-200 rounded-2xl p-5"
-            >
-              <p className="text-sm font-semibold text-gray-400 mb-3">
-                Palabra {i + 1}
-              </p>
+            <div key={i} className="bg-white border-2 border-gray-200 rounded-2xl p-5 relative">
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-sm font-semibold text-gray-400">Palabra {i + 1}</p>
+                {words.length > 1 && (
+                  <button
+                    type="button"
+                    onClick={() => removeWord(i)}
+                    className="text-gray-300 hover:text-red-400 transition-colors text-xl leading-none font-bold"
+                    title="Eliminar"
+                  >
+                    ×
+                  </button>
+                )}
+              </div>
               <div className="grid grid-cols-2 gap-4 mb-4">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-600 mb-1">
-                    Español
-                  </label>
+                  <label className="block text-sm font-semibold text-gray-600 mb-1">Español</label>
                   <input
                     type="text"
                     value={word.spanish}
@@ -159,9 +166,7 @@ export default function EditGroupPage({ params }: Props) {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-gray-600 mb-1">
-                    English
-                  </label>
+                  <label className="block text-sm font-semibold text-gray-600 mb-1">English</label>
                   <input
                     type="text"
                     value={word.english}
@@ -196,16 +201,23 @@ export default function EditGroupPage({ params }: Props) {
           ))}
         </div>
 
+        {/* Add word button */}
+        <button
+          type="button"
+          onClick={addWord}
+          className="mt-4 w-full py-3 border-2 border-dashed border-gray-300 rounded-2xl text-gray-400 hover:border-blue-400 hover:text-blue-500 font-bold text-lg transition-all"
+        >
+          + Añadir palabra
+        </button>
+
         {error && (
-          <p className="mt-6 text-center text-red-600 font-semibold text-lg">
-            {error}
-          </p>
+          <p className="mt-6 text-center text-red-600 font-semibold text-lg">{error}</p>
         )}
 
         <button
           type="submit"
           disabled={saving}
-          className="mt-8 w-full text-xl font-bold py-5 bg-green-500 text-white rounded-2xl hover:bg-green-600 disabled:opacity-50 transition-all shadow-sm"
+          className="mt-6 w-full text-xl font-bold py-5 bg-green-500 text-white rounded-2xl hover:bg-green-600 disabled:opacity-50 transition-all shadow-sm"
         >
           {saving ? "Guardando..." : "Guardar cambios"}
         </button>
