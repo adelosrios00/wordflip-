@@ -89,6 +89,7 @@ export function PracticeSession({ words, studentId, groupId, groupName, groupTyp
 
   const [done, setDone] = useState(() => buildDone(initialProgress));
   const [showPreview, setShowPreview] = useState(true);
+  const completionRecorded = useRef(false);
 
   useEffect(() => {
     const local = loadLocal(studentId, groupId);
@@ -218,7 +219,22 @@ export function PracticeSession({ words, studentId, groupId, groupName, groupTyp
     }
   }
 
+  // Record completion when reaching 100% for the first time each session
+  useEffect(() => {
+    if (phase === "complete" && !completionRecorded.current) {
+      completionRecorded.current = true;
+      fetch("/api/progress/complete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ studentId, wordGroupId: groupId }),
+        keepalive: true,
+      }).catch(() => {});
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phase]);
+
   async function handleRestart() {
+    completionRecorded.current = false;
     await fetch("/api/progress/reset", {
       method: "POST",
       headers: { "Content-Type": "application/json" },

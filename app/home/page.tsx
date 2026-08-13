@@ -59,6 +59,15 @@ export default async function StudentHome() {
       })
     : [];
 
+  const myCompletions = allGroupIds.length > 0
+    ? await prisma.groupCompletion.groupBy({
+        by: ["wordGroupId"],
+        _count: { _all: true },
+        where: { studentId: student.id, wordGroupId: { in: allGroupIds } },
+      })
+    : [];
+  const completionsMap = new Map(myCompletions.map((c) => [c.wordGroupId, c._count._all]));
+
   const progressMap = new Map(allProgress.map((p) => [`${p.studentId}:${p.wordGroupId}`, p._count._all]));
 
   function getMastery(studentId: string, wordGroupId: string, wordCount: number) {
@@ -115,6 +124,7 @@ export default async function StudentHome() {
               const isComplete = mastery >= 100;
               const isStarted = mastery > 0;
               const dl = deadline ? formatDeadline(new Date(deadline)) : null;
+              const timesCompleted = completionsMap.get(g.id) ?? 0;
 
               return (
                 <div key={g.id} className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
@@ -169,6 +179,11 @@ export default async function StudentHome() {
                         isComplete ? "text-emerald-500" : isStarted ? "text-blue-500" : "text-slate-400"
                       }`}>
                         {isComplete ? "Completed" : isStarted ? "Keep practicing" : "Start practicing"}
+                        {timesCompleted > 0 && (
+                          <span className="ml-2 text-xs font-bold bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full">
+                            ✓ {timesCompleted}×
+                          </span>
+                        )}
                       </p>
                       {dl && (
                         <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${

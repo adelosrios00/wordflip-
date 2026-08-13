@@ -89,3 +89,10 @@ model Progress {
 
   @@unique([studentId, wordGroupId, phase, wordId])
 }
+
+model GroupCompletion {
+  id          String   @id @default(cuid())
+  studentId   String
+  wordGroupId String
+  completedAt DateTime @default(now())
+}

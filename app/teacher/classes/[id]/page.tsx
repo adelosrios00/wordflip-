@@ -45,7 +45,19 @@ export default async function ClassPage({ params }: { params: Promise<{ id: stri
       })
     : [];
 
+  const allCompletions = cls.students.length > 0 && cls.groups.length > 0
+    ? await prisma.groupCompletion.groupBy({
+        by: ["studentId", "wordGroupId"],
+        _count: { _all: true },
+        where: {
+          studentId: { in: cls.students.map((s) => s.id) },
+          wordGroupId: { in: cls.groups.map((g) => g.wordGroupId) },
+        },
+      })
+    : [];
+
   const progressMap = new Map(allProgress.map((p) => [`${p.studentId}:${p.wordGroupId}`, p._count._all]));
+  const completionsMap = new Map(allCompletions.map((c) => [`${c.studentId}:${c.wordGroupId}`, c._count._all]));
 
   function getMastery(studentId: string, groupId: string, wordCount: number) {
     const count = progressMap.get(`${studentId}:${groupId}`) ?? 0;
@@ -115,6 +127,7 @@ export default async function ClassPage({ params }: { params: Promise<{ id: stri
                       <td className="px-5 py-3.5 font-bold text-slate-800 whitespace-nowrap">{s.name}</td>
                       {cls.groups.map((g, i) => {
                         const pct = masteries[i];
+                        const times = completionsMap.get(`${s.id}:${g.wordGroupId}`) ?? 0;
                         return (
                           <td key={g.wordGroupId} className="px-4 py-3.5 text-center">
                             <span className={`text-sm font-bold ${
@@ -122,6 +135,11 @@ export default async function ClassPage({ params }: { params: Promise<{ id: stri
                             }`}>
                               {pct >= 100 ? "100%" : pct > 0 ? `${pct}%` : "—"}
                             </span>
+                            {times > 0 && (
+                              <span className="block text-xs text-emerald-500 font-semibold mt-0.5">
+                                {times}×
+                              </span>
+                            )}
                           </td>
                         );
                       })}
