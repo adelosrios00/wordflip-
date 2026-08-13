@@ -33,7 +33,7 @@ export default async function PracticePage({ params }: Props) {
     return (
       <main className="max-w-lg mx-auto p-8 text-center mt-20">
         <h1 className="text-2xl font-bold text-gray-700 mb-4">{group.name}</h1>
-        <p className="text-xl text-gray-400">Este grupo no tiene palabras todavía.</p>
+        <p className="text-xl text-gray-400">This set has no words yet.</p>
       </main>
     );
   }
@@ -56,6 +56,7 @@ export default async function PracticePage({ params }: Props) {
         groupId={groupId}
         groupName={group.name}
         groupType={group.groupType as "words" | "phrases"}
+        targetLang={group.targetLang}
         initialProgress={progress}
       />
     </main>

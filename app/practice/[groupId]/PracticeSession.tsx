@@ -3,8 +3,9 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 
-type Phase = "match_es_en" | "match_en_es" | "unscramble" | "type_en" | "type_es" | "complete";
-const PHASES: Phase[] = ["match_es_en", "match_en_es", "unscramble", "type_en", "type_es"];
+type Phase = "match_es_en" | "match_en_es" | "type_en" | "unscramble" | "type_es" | "complete";
+// Phase order: Phase 1 recognition × 2, Phase 2 spell in target lang, Phase 3 spell in source lang × 2
+const PHASES: Phase[] = ["match_es_en", "match_en_es", "type_en", "unscramble", "type_es"];
 
 interface Word {
   id: string;
@@ -19,6 +20,7 @@ interface Props {
   groupId: string;
   groupName: string;
   groupType: "words" | "phrases";
+  targetLang: string;
   initialProgress: { phase: string; wordId: string }[];
 }
 
@@ -49,7 +51,36 @@ function loadLocal(sid: string, gid: string): Set<string> {
   return new Set();
 }
 
-export function PracticeSession({ words, studentId, groupId, groupName, groupType, initialProgress }: Props) {
+function getLangName(code: string): string {
+  switch (code) {
+    case "fr": return "French";
+    case "de": return "German";
+    case "it": return "Italian";
+    case "pt": return "Portuguese";
+    default:   return "English";
+  }
+}
+
+function getLangCode(code: string): string {
+  switch (code) {
+    case "fr": return "FR";
+    case "de": return "DE";
+    case "it": return "IT";
+    case "pt": return "PT";
+    default:   return "EN";
+  }
+}
+
+function getSpecialChars(lang: string): string[] {
+  switch (lang) {
+    case "fr":
+      return ["é","è","ê","ë","à","â","ù","û","î","ï","ô","œ","ç","Ç","Œ","?","!"];
+    default:
+      return ["á","é","í","ó","ú","ñ","Á","É","Í","Ó","Ú","Ñ","¿","?","¡","!"];
+  }
+}
+
+export function PracticeSession({ words, studentId, groupId, groupName, groupType, targetLang, initialProgress }: Props) {
   const buildDone = (p: { phase: string; wordId: string }[]) => {
     const db = new Set(p.map((x) => `${x.phase}:${x.wordId}`));
     const local = loadLocal(studentId, groupId);
@@ -59,7 +90,6 @@ export function PracticeSession({ words, studentId, groupId, groupName, groupTyp
   const [done, setDone] = useState(() => buildDone(initialProgress));
   const [showPreview, setShowPreview] = useState(true);
 
-  // On mount: sync any localStorage progress that isn't in the DB yet
   useEffect(() => {
     const local = loadLocal(studentId, groupId);
     const db = new Set(initialProgress.map((x) => `${x.phase}:${x.wordId}`));
@@ -134,9 +164,7 @@ export function PracticeSession({ words, studentId, groupId, groupName, groupTyp
     const newDone = new Set(done);
     newDone.add(key);
     setDone(newDone);
-    // Save locally first (instant, reliable)
     saveLocal(studentId, groupId, newDone);
-    // Also send to DB (may fail silently on Neon cold start)
     fetch("/api/progress", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -187,7 +215,6 @@ export function PracticeSession({ words, studentId, groupId, groupName, groupTyp
       setTimeout(() => { setTypVal(""); setTypCorrect(false); advance(); }, 600);
     } else {
       setTypWrong(true);
-      // Don't clear — let the student see and fix their answer
     }
   }
 
@@ -202,19 +229,32 @@ export function PracticeSession({ words, studentId, groupId, groupName, groupTyp
     setWordIdx(0);
   }
 
-  const specialChars = ["á", "é", "í", "ó", "ú", "ñ", "Á", "É", "Í", "Ó", "Ú", "Ñ", "¿", "?", "¡", "!"];
+  const langName = getLangName(targetLang);
+  const langCode = getLangCode(targetLang);
+  const sourceSpecialChars = getSpecialChars("es");
+  const targetSpecialChars = getSpecialChars(targetLang);
+
+  const phaseLabel: Record<Phase, string> = {
+    match_es_en:  `Phase 1 · Recognition ES → ${langCode}`,
+    match_en_es:  `Phase 1 · Recognition ${langCode} → ES`,
+    type_en:      `Phase 2 · Spell in ${langName}`,
+    unscramble:   `Phase 3 · Spell in Spanish`,
+    type_es:      `Phase 3 · Spell in Spanish`,
+    complete: "",
+  };
+
+  const isWords = groupType === "words";
 
   // ── PREVIEW ──
   if (showPreview) {
-    const isWords = groupType === "words";
     return (
       <div className="max-w-3xl mx-auto p-6">
         <div className="flex items-center justify-between mb-6">
-          <Link href="/home" className="text-blue-600 hover:underline text-lg">← Grupos</Link>
+          <Link href="/home" className="text-blue-600 hover:underline text-lg">← Sets</Link>
           <h1 className="text-2xl font-bold text-gray-800">{groupName}</h1>
-          <span className="text-gray-400 text-sm">{words.length} {isWords ? "palabras" : "frases"}</span>
+          <span className="text-gray-400 text-sm">{words.length} {isWords ? "words" : "phrases"}</span>
         </div>
-        <p className="text-center text-gray-500 text-lg mb-6">Repasa antes de empezar:</p>
+        <p className="text-center text-gray-500 text-lg mb-6">Study before you start:</p>
         <div className={`grid gap-4 mb-10 ${isWords ? "grid-cols-2 sm:grid-cols-3 md:grid-cols-5" : "grid-cols-1 sm:grid-cols-2"}`}>
           {words.map((w) => (
             <div key={w.id} className="bg-white rounded-2xl border-2 border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
@@ -233,7 +273,7 @@ export function PracticeSession({ words, studentId, groupId, groupName, groupTyp
             onClick={() => setShowPreview(false)}
             className="text-2xl font-bold px-16 py-5 bg-green-500 text-white rounded-full hover:bg-green-600 active:scale-95 transition-all shadow-lg"
           >
-            {mastery > 0 ? `▶ Continuar (${mastery}%)` : "▶ ¡Empezar!"}
+            {mastery > 0 ? `▶ Continue (${mastery}%)` : "▶ Start!"}
           </button>
         </div>
       </div>
@@ -244,7 +284,6 @@ export function PracticeSession({ words, studentId, groupId, groupName, groupTyp
   if (phase === "complete") {
     return (
       <div className="relative max-w-lg mx-auto text-center py-20 px-8 overflow-hidden">
-        {/* Confetti */}
         <div className="pointer-events-none fixed inset-0 z-50 overflow-hidden">
           {Array.from({ length: 60 }).map((_, i) => {
             const colors = ["#2563eb","#7c3aed","#10b981","#f59e0b","#ef4444","#ec4899"];
@@ -283,15 +322,15 @@ export function PracticeSession({ words, studentId, groupId, groupName, groupTyp
               <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
             </svg>
           </div>
-          <h1 className="text-4xl font-black text-slate-800 mb-2">¡Completado!</h1>
+          <h1 className="text-4xl font-black text-slate-800 mb-2">Completed!</h1>
           <p className="text-emerald-600 font-bold text-xl mb-1">100% · {groupName}</p>
-          <p className="text-slate-400 text-sm mb-10">Has dominado todas las palabras de este grupo</p>
+          <p className="text-slate-400 text-sm mb-10">You have mastered all the words in this set</p>
           <Link href="/home" className="inline-block font-black px-10 py-4 bg-blue-600 text-white rounded-2xl hover:bg-blue-700 transition-all shadow-md text-lg">
-            ← Volver a mis grupos
+            ← Back to my sets
           </Link>
           <div className="mt-5">
             <button onClick={handleRestart} className="text-slate-400 hover:text-slate-600 text-sm underline">
-              Volver a empezar desde cero
+              Start again from the beginning
             </button>
           </div>
         </div>
@@ -299,19 +338,10 @@ export function PracticeSession({ words, studentId, groupId, groupName, groupTyp
     );
   }
 
-  const phaseLabel: Record<Phase, string> = {
-    match_es_en: "Fase 1 · Reconocimiento ES → EN",
-    match_en_es: "Fase 1 · Reconocimiento EN → ES",
-    unscramble: "Fase 2 · Deletrear en español",
-    type_en: "Fase 3 · Escribir en inglés",
-    type_es: "Fase 3 · Escribir en español",
-    complete: "",
-  };
-
   return (
     <div className="max-w-2xl mx-auto p-6">
       <div className="flex items-center justify-between mb-3">
-        <Link href="/home" className="text-blue-600 hover:underline text-lg">← Grupos</Link>
+        <Link href="/home" className="text-blue-600 hover:underline text-lg">← Sets</Link>
         <h1 className="text-xl font-bold text-gray-700 truncate mx-4">{groupName}</h1>
         <span className="text-2xl font-bold text-blue-700 shrink-0">{mastery}%</span>
       </div>
@@ -357,7 +387,78 @@ export function PracticeSession({ words, studentId, groupId, groupName, groupTyp
         </div>
       )}
 
-      {/* UNSCRAMBLE */}
+      {/* TYPING — Phase 2: see Spanish, type target language */}
+      {phase === "type_en" && (() => {
+        const prompt = word.spanish;
+        const promptLen = prompt.length;
+        const promptSize = promptLen > 60 ? "text-lg" : promptLen > 35 ? "text-2xl" : promptLen > 20 ? "text-3xl" : "text-4xl";
+
+        return (
+          <div>
+            <div className="flex justify-center mb-4">
+              <img src={word.imageUrl ?? FALLBACK_IMG} alt="" className="h-32 w-32 object-cover rounded-2xl shadow-md" />
+            </div>
+            <div className={`text-center font-bold text-gray-800 mb-2 leading-snug break-words px-2 ${promptSize}`}>
+              {prompt}
+            </div>
+            <p className="text-center text-sm text-gray-400 mb-5">
+              Write in {langName}
+            </p>
+            <form onSubmit={handleTypingSubmit} className="flex gap-3 max-w-md mx-auto">
+              <input
+                ref={typRef}
+                type="text"
+                value={typVal}
+                onChange={(e) => { setTypVal(e.target.value); if (typWrong) setTypWrong(false); }}
+                autoComplete="off"
+                autoCorrect="off"
+                spellCheck={false}
+                placeholder="Type here..."
+                className={`flex-1 text-xl font-semibold border-4 rounded-2xl px-5 py-4 focus:outline-none text-center transition-all ${
+                  typWrong ? "border-red-400 bg-red-50 text-red-700"
+                  : typCorrect ? "border-emerald-400 bg-emerald-50 text-emerald-700"
+                  : "border-gray-300 focus:border-blue-500 bg-white"
+                }`}
+              />
+              <button type="submit" className="text-2xl font-bold px-6 py-4 bg-emerald-500 text-white rounded-2xl hover:bg-emerald-600 active:scale-95 transition-all shadow-sm">
+                ✓
+              </button>
+            </form>
+            {targetSpecialChars.length > 0 && (
+              <div className="flex flex-wrap gap-2 justify-center mt-3 max-w-md mx-auto">
+                {targetSpecialChars.map((ch) => (
+                  <button
+                    key={ch}
+                    type="button"
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      const input = typRef.current;
+                      if (!input) return;
+                      const start = input.selectionStart ?? typVal.length;
+                      const end = input.selectionEnd ?? typVal.length;
+                      const newVal = typVal.slice(0, start) + ch + typVal.slice(end);
+                      setTypVal(newVal);
+                      if (typWrong) setTypWrong(false);
+                      setTimeout(() => { input.focus(); input.setSelectionRange(start + 1, start + 1); }, 0);
+                    }}
+                    className="px-3 py-2 text-base font-bold bg-gray-100 hover:bg-yellow-100 hover:border-yellow-400 rounded-xl border-2 border-gray-300 transition-all"
+                  >
+                    {ch}
+                  </button>
+                ))}
+              </div>
+            )}
+            {typWrong && (
+              <p className="text-red-500 font-semibold text-sm text-center mt-4">Incorrect, try again</p>
+            )}
+            {typCorrect && (
+              <p className="text-emerald-600 font-bold text-lg text-center mt-5">Correct!</p>
+            )}
+          </div>
+        );
+      })()}
+
+      {/* UNSCRAMBLE — Phase 3: see English/target, spell Spanish */}
       {phase === "unscramble" && (
         <div>
           <div className="flex justify-center mb-4">
@@ -389,7 +490,7 @@ export function PracticeSession({ words, studentId, groupId, groupName, groupTyp
             })}
           </div>
           <div className="flex flex-wrap gap-2 justify-center mb-3">
-            {specialChars.map((ch) => (
+            {sourceSpecialChars.map((ch) => (
               <button
                 key={ch}
                 onMouseDown={(e) => { e.preventDefault(); handleScrambleChar(ch); }}
@@ -399,14 +500,13 @@ export function PracticeSession({ words, studentId, groupId, groupName, groupTyp
               </button>
             ))}
           </div>
-          <p className="text-center text-gray-400 text-sm">Haz clic aquí arriba y escribe con el teclado</p>
+          <p className="text-center text-gray-400 text-sm">Click on the first box and type on your keyboard</p>
         </div>
       )}
 
-      {/* TYPING */}
-      {(phase === "type_en" || phase === "type_es") && (() => {
-        const target = phase === "type_en" ? word.english : word.spanish;
-        const prompt = phase === "type_en" ? word.spanish : word.english;
+      {/* TYPING — Phase 3: see target language, type Spanish */}
+      {phase === "type_es" && (() => {
+        const prompt = word.english;
         const promptLen = prompt.length;
         const promptSize = promptLen > 60 ? "text-lg" : promptLen > 35 ? "text-2xl" : promptLen > 20 ? "text-3xl" : "text-4xl";
 
@@ -415,28 +515,20 @@ export function PracticeSession({ words, studentId, groupId, groupName, groupTyp
             <div className="flex justify-center mb-4">
               <img src={word.imageUrl ?? FALLBACK_IMG} alt="" className="h-32 w-32 object-cover rounded-2xl shadow-md" />
             </div>
-
-            {/* Prompt — always visible, size adapts to length */}
             <div className={`text-center font-bold text-gray-800 mb-2 leading-snug break-words px-2 ${promptSize}`}>
               {prompt}
             </div>
-            <p className="text-center text-sm text-gray-400 mb-5">
-              {phase === "type_en" ? "Escribe en inglés" : "Escribe en español"}
-            </p>
-
+            <p className="text-center text-sm text-gray-400 mb-5">Write in Spanish</p>
             <form onSubmit={handleTypingSubmit} className="flex gap-3 max-w-md mx-auto">
               <input
                 ref={typRef}
                 type="text"
                 value={typVal}
-                onChange={(e) => {
-                  setTypVal(e.target.value);
-                  if (typWrong) setTypWrong(false);
-                }}
+                onChange={(e) => { setTypVal(e.target.value); if (typWrong) setTypWrong(false); }}
                 autoComplete="off"
                 autoCorrect="off"
                 spellCheck={false}
-                placeholder="Escribe aquí..."
+                placeholder="Type here..."
                 className={`flex-1 text-xl font-semibold border-4 rounded-2xl px-5 py-4 focus:outline-none text-center transition-all ${
                   typWrong ? "border-red-400 bg-red-50 text-red-700"
                   : typCorrect ? "border-emerald-400 bg-emerald-50 text-emerald-700"
@@ -447,10 +539,8 @@ export function PracticeSession({ words, studentId, groupId, groupName, groupTyp
                 ✓
               </button>
             </form>
-
-            {/* Special chars */}
             <div className="flex flex-wrap gap-2 justify-center mt-3 max-w-md mx-auto">
-              {specialChars.map((ch) => (
+              {sourceSpecialChars.map((ch) => (
                 <button
                   key={ch}
                   type="button"
@@ -471,15 +561,11 @@ export function PracticeSession({ words, studentId, groupId, groupName, groupTyp
                 </button>
               ))}
             </div>
-
-            {/* Error feedback — no correct answer shown */}
             {typWrong && (
-              <p className="text-red-500 font-semibold text-sm text-center mt-4">
-                Incorrecto, inténtalo de nuevo
-              </p>
+              <p className="text-red-500 font-semibold text-sm text-center mt-4">Incorrect, try again</p>
             )}
             {typCorrect && (
-              <p className="text-emerald-600 font-bold text-lg text-center mt-5">¡Correcto!</p>
+              <p className="text-emerald-600 font-bold text-lg text-center mt-5">Correct!</p>
             )}
           </div>
         );

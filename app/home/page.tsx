@@ -9,11 +9,11 @@ function formatDeadline(deadline: Date): { label: string; urgent: boolean } {
   const now = new Date();
   const diff = deadline.getTime() - now.getTime();
   const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
-  if (days < 0) return { label: "Plazo vencido", urgent: true };
-  if (days === 0) return { label: "Vence hoy", urgent: true };
-  if (days === 1) return { label: "Vence mañana", urgent: true };
-  if (days <= 3) return { label: `${days} días`, urgent: true };
-  return { label: `${days} días`, urgent: false };
+  if (days < 0) return { label: "Past due", urgent: true };
+  if (days === 0) return { label: "Due today", urgent: true };
+  if (days === 1) return { label: "Due tomorrow", urgent: true };
+  if (days <= 3) return { label: `${days} days`, urgent: true };
+  return { label: `${days} days`, urgent: false };
 }
 
 export default async function StudentHome() {
@@ -29,8 +29,8 @@ export default async function StudentHome() {
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
           </div>
-          <h1 className="text-xl font-black text-slate-800 mb-2">Sin clase asignada</h1>
-          <p className="text-slate-500 text-sm">Tu profesor todavía no te ha asignado a ninguna clase.</p>
+          <h1 className="text-xl font-black text-slate-800 mb-2">No class assigned</h1>
+          <p className="text-slate-500 text-sm">Your teacher hasn&apos;t assigned you to a class yet.</p>
         </div>
       </main>
     );
@@ -72,15 +72,6 @@ export default async function StudentHome() {
     ? Math.round(myMasteries.reduce((a, b) => a + b, 0) / myMasteries.length)
     : 0;
 
-  // Ranking
-  const ranking = cls.students.map((s) => {
-    const masteries = cls.groups.map(({ wordGroup: g }) => getMastery(s.id, g.id, g._count.words));
-    const avg = masteries.length > 0
-      ? Math.round(masteries.reduce((a, b) => a + b, 0) / masteries.length)
-      : 0;
-    return { id: s.id, name: s.name, avg };
-  }).sort((a, b) => b.avg - a.avg);
-
   return (
     <main className="min-h-screen" style={{ background: "#f1f5f9" }}>
 
@@ -90,7 +81,7 @@ export default async function StudentHome() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-blue-200 text-xs font-bold uppercase tracking-widest mb-1">{cls.name}</p>
-              <h1 className="text-3xl font-black text-white">Hola, {student.name}</h1>
+              <h1 className="text-3xl font-black text-white">Hello, {student.name}</h1>
             </div>
             <LogoutStudentButton />
           </div>
@@ -98,15 +89,15 @@ export default async function StudentHome() {
           <div className="flex gap-3 mt-8">
             <div className="flex-1 bg-white/15 backdrop-blur rounded-2xl px-4 py-3 text-center">
               <p className="text-2xl font-black text-white">{cls.groups.length}</p>
-              <p className="text-blue-200 text-xs font-semibold mt-0.5">Grupos</p>
+              <p className="text-blue-200 text-xs font-semibold mt-0.5">Sets</p>
             </div>
             <div className="flex-1 bg-white/15 backdrop-blur rounded-2xl px-4 py-3 text-center">
               <p className="text-2xl font-black text-white">{completed}</p>
-              <p className="text-blue-200 text-xs font-semibold mt-0.5">Completados</p>
+              <p className="text-blue-200 text-xs font-semibold mt-0.5">Completed</p>
             </div>
             <div className="flex-1 bg-white/15 backdrop-blur rounded-2xl px-4 py-3 text-center">
               <p className="text-2xl font-black text-white">{overallPct}%</p>
-              <p className="text-blue-200 text-xs font-semibold mt-0.5">Progreso</p>
+              <p className="text-blue-200 text-xs font-semibold mt-0.5">Progress</p>
             </div>
           </div>
         </div>
@@ -115,7 +106,7 @@ export default async function StudentHome() {
       <div className="max-w-xl mx-auto px-6" style={{ marginTop: -24 }}>
         {cls.groups.length === 0 ? (
           <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-10 text-center">
-            <p className="text-slate-400 text-sm font-semibold">Tu profesor todavía no ha asignado grupos a tu clase.</p>
+            <p className="text-slate-400 text-sm font-semibold">Your teacher hasn&apos;t assigned any sets to your class yet.</p>
           </div>
         ) : (
           <div className="flex flex-col gap-3 pb-4">
@@ -153,7 +144,7 @@ export default async function StudentHome() {
                         <div>
                           <h2 className="font-black text-slate-800">{g.name}</h2>
                           <p className="text-xs text-slate-400 mt-0.5">
-                            {g.groupType === "phrases" ? "Frases" : "Palabras"} · {g._count.words} entradas
+                            {g.groupType === "phrases" ? "Phrases" : "Words"} · {g._count.words} entries
                           </p>
                         </div>
                       </div>
@@ -177,7 +168,7 @@ export default async function StudentHome() {
                       <p className={`text-xs font-semibold ${
                         isComplete ? "text-emerald-500" : isStarted ? "text-blue-500" : "text-slate-400"
                       }`}>
-                        {isComplete ? "Completado" : isStarted ? "Continúa practicando" : "Empieza a practicar"}
+                        {isComplete ? "Completed" : isStarted ? "Keep practicing" : "Start practicing"}
                       </p>
                       {dl && (
                         <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${
@@ -196,7 +187,7 @@ export default async function StudentHome() {
                         href={`/practice/${g.id}?repaso=1`}
                         className="text-xs font-bold text-violet-600 hover:text-violet-800 transition-colors"
                       >
-                        Repaso rápido — solo palabras pendientes →
+                        Quick review — pending words only →
                       </Link>
                     </div>
                   )}
@@ -206,40 +197,6 @@ export default async function StudentHome() {
           </div>
         )}
 
-        {/* Ranking de clase */}
-        {ranking.length > 1 && (
-          <section className="mb-8">
-            <h2 className="text-sm font-bold text-slate-500 uppercase tracking-widest mb-3">Ranking de la clase</h2>
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-              {ranking.map((s, i) => {
-                const isMe = s.id === student.id;
-                const medal = i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : null;
-                return (
-                  <div
-                    key={s.id}
-                    className={`flex items-center justify-between px-5 py-3.5 ${
-                      isMe ? "bg-blue-50 border-l-4 border-blue-500" : ""
-                    } ${i < ranking.length - 1 ? "border-b border-slate-50" : ""}`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <span className="text-slate-400 text-sm font-bold w-5">
-                        {medal ?? `${i + 1}`}
-                      </span>
-                      <span className={`font-bold text-sm ${isMe ? "text-blue-700" : "text-slate-700"}`}>
-                        {s.name} {isMe && <span className="text-blue-400 font-normal">(tú)</span>}
-                      </span>
-                    </div>
-                    <span className={`font-black text-sm ${
-                      s.avg >= 100 ? "text-emerald-600" : s.avg > 0 ? "text-blue-600" : "text-slate-300"
-                    }`}>
-                      {s.avg}%
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
-          </section>
-        )}
       </div>
     </main>
   );

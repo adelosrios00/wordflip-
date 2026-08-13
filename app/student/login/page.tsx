@@ -24,7 +24,7 @@ export default function StudentLogin() {
       router.push("/home");
     } else {
       const d = await res.json();
-      setError(d.error || "Usuario o contraseña incorrectos");
+      setError(d.error || "Incorrect username or password");
       setLoading(false);
     }
   }
@@ -36,23 +36,23 @@ export default function StudentLogin() {
           <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" d="M15 18l-6-6 6-6" />
           </svg>
-          Volver
+          Back
         </Link>
 
         <div className="mb-7">
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">Acceso alumnos</h1>
-          <p className="text-slate-500 text-sm mt-1">Introduce tu usuario y contraseña</p>
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900">Student access</h1>
+          <p className="text-slate-500 text-sm mt-1">Enter your username and password</p>
         </div>
 
         <div className="bg-white border border-slate-200 rounded-2xl p-7 shadow-sm">
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1.5">Usuario</label>
+              <label className="block text-sm font-medium text-slate-700 mb-1.5">Username</label>
               <input
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                placeholder="nombre.apellido"
+                placeholder="first.last"
                 required
                 autoFocus
                 autoComplete="username"
@@ -60,7 +60,7 @@ export default function StudentLogin() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1.5">Contraseña</label>
+              <label className="block text-sm font-medium text-slate-700 mb-1.5">Password</label>
               <input
                 type="password"
                 value={password}
@@ -81,7 +81,7 @@ export default function StudentLogin() {
               disabled={loading}
               className="w-full py-2.5 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 disabled:opacity-50 transition-all text-sm mt-1"
             >
-              {loading ? "Entrando..." : "Entrar"}
+              {loading ? "Signing in..." : "Sign in"}
             </button>
           </form>
         </div>

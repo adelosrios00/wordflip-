@@ -45,7 +45,7 @@ export default function Home() {
           style={{ borderRadius: 32, boxShadow: "0 8px 32px rgba(0,0,0,0.18)" }}
         />
         <p className="text-blue-200 text-xs mt-5 font-bold tracking-widest uppercase">
-          Vocabulario ES · EN
+          Vocabulary App
         </p>
       </div>
 
@@ -68,8 +68,8 @@ export default function Home() {
                 <StudentIcon />
               </div>
               <div>
-                <p className="font-bold text-slate-800">Acceso alumnos</p>
-                <p className="text-slate-400 text-xs mt-0.5">Entra con tu usuario y contraseña</p>
+                <p className="font-bold text-slate-800">Student access</p>
+                <p className="text-slate-400 text-xs mt-0.5">Log in with your username and password</p>
               </div>
             </div>
             <span className="text-slate-300 group-hover:text-blue-500 group-hover:translate-x-0.5 transition-all">
@@ -86,8 +86,8 @@ export default function Home() {
                 <TeacherIcon />
               </div>
               <div>
-                <p className="font-bold text-slate-800">Acceso profesores</p>
-                <p className="text-slate-400 text-xs mt-0.5">Gestiona tus clases y grupos</p>
+                <p className="font-bold text-slate-800">Teacher access</p>
+                <p className="text-slate-400 text-xs mt-0.5">Manage your classes and groups</p>
               </div>
             </div>
             <span className="text-slate-300 group-hover:text-violet-500 group-hover:translate-x-0.5 transition-all">

@@ -9,7 +9,7 @@ export function LogoutStudentButton() {
   }
   return (
     <button onClick={handle} className="text-sm text-blue-200 hover:text-white font-semibold transition-colors">
-      Cerrar sesión
+      Log out
     </button>
   );
 }
