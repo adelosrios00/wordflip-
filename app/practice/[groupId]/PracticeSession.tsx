@@ -84,7 +84,9 @@ export function PracticeSession({ words, studentId, groupId, groupName, groupTyp
   const buildDone = (p: { phase: string; wordId: string }[]) => {
     const db = new Set(p.map((x) => `${x.phase}:${x.wordId}`));
     const local = loadLocal(studentId, groupId);
-    return new Set([...db, ...local]);
+    const validIds = new Set(words.map((w) => w.id));
+    const validLocal = new Set([...local].filter((k) => validIds.has(k.split(":")[1])));
+    return new Set([...db, ...validLocal]);
   };
 
   const [done, setDone] = useState(() => buildDone(initialProgress));
@@ -235,6 +237,7 @@ export function PracticeSession({ words, studentId, groupId, groupName, groupTyp
 
   async function handleRestart() {
     completionRecorded.current = false;
+    try { localStorage.removeItem(localKey(studentId, groupId)); } catch {}
     await fetch("/api/progress/reset", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -243,6 +246,7 @@ export function PracticeSession({ words, studentId, groupId, groupName, groupTyp
     setDone(new Set());
     setPhase("match_es_en");
     setWordIdx(0);
+    setShowPreview(true);
   }
 
   const langName = getLangName(targetLang);
@@ -289,7 +293,7 @@ export function PracticeSession({ words, studentId, groupId, groupName, groupTyp
             onClick={() => setShowPreview(false)}
             className="text-2xl font-bold px-16 py-5 bg-green-500 text-white rounded-full hover:bg-green-600 active:scale-95 transition-all shadow-lg"
           >
-            {mastery > 0 ? `▶ Continue (${mastery}%)` : "▶ Start!"}
+            {mastery > 0 && mastery < 100 ? "▶ Continue" : "▶ Start!"}
           </button>
         </div>
       </div>
