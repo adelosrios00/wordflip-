@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { ClassGroupsManager } from "./ClassGroupsManager";
 import { StudentManager } from "./StudentManager";
+import { ResetGroupProgressButton } from "./ResetGroupProgressButton";
 
 export default async function ClassPage({ params }: { params: Promise<{ id: string }> }) {
   const teacher = await getTeacher();
@@ -99,7 +100,14 @@ export default async function ClassPage({ params }: { params: Promise<{ id: stri
                   <th className="px-5 py-3 text-left font-bold text-slate-500">Alumno</th>
                   {cls.groups.map((g) => (
                     <th key={g.wordGroupId} className="px-4 py-3 text-center font-bold text-slate-500 whitespace-nowrap">
-                      {g.wordGroup.name}
+                      <span className="inline-flex items-center gap-1">
+                        {g.wordGroup.name}
+                        <ResetGroupProgressButton
+                          groupId={g.wordGroupId}
+                          groupName={g.wordGroup.name}
+                          classId={id}
+                        />
+                      </span>
                     </th>
                   ))}
                   <th className="px-5 py-3 text-center font-bold text-slate-500">Media</th>
