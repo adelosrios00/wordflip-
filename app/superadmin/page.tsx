@@ -92,7 +92,9 @@ export default async function SuperadminPage() {
               {teachers.map((t) => {
                 const students = t.classes.reduce((a, c) => a + c._count.students, 0);
                 return (
-                  <div key={t.id} className="bg-white rounded-2xl shadow-sm border border-slate-100 px-5 py-4 flex items-center justify-between">
+                  <Link key={t.id} href={`/superadmin/teachers/${t.id}`}
+                    className="group bg-white rounded-2xl shadow-sm border border-slate-100 px-5 py-4 flex items-center justify-between hover:border-slate-300 hover:shadow-md transition-all"
+                  >
                     <div className="flex items-center gap-4">
                       <div className="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center shrink-0">
                         <span className="text-white font-black text-sm uppercase">{t.username[0]}</span>
@@ -104,8 +106,13 @@ export default async function SuperadminPage() {
                         </p>
                       </div>
                     </div>
-                    <span className="text-xs font-bold px-3 py-1 rounded-full bg-emerald-50 text-emerald-600">Activo</span>
-                  </div>
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs font-bold px-3 py-1 rounded-full bg-emerald-50 text-emerald-600">Activo</span>
+                      <svg className="w-4 h-4 text-slate-300 group-hover:text-slate-500 group-hover:translate-x-0.5 transition-all" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 18l6-6-6-6" />
+                      </svg>
+                    </div>
+                  </Link>
                 );
               })}
             </div>

@@ -11,6 +11,7 @@ model Teacher {
   id           String          @id @default(cuid())
   username     String          @unique
   passwordHash String
+  lastLoginAt  DateTime?
   classes      Class[]
   invites      TeacherInvite[]
   wordGroups   WordGroup[]
@@ -63,6 +64,7 @@ model WordGroup {
   groupType  String           @default("words") @map("type")
   targetLang String           @default("en")
   teacherId  String?
+  isPublic   Boolean          @default(false)
   teacher    Teacher?         @relation(fields: [teacherId], references: [id])
   words      Word[]
   progress   Progress[]

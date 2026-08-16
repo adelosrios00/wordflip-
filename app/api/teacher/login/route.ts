@@ -18,6 +18,11 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Usuario o contraseña incorrectos" }, { status: 401 });
   }
 
+  await prisma.teacher.update({
+    where: { id: teacher.id },
+    data: { lastLoginAt: new Date() },
+  });
+
   const res = NextResponse.json({ ok: true });
   res.cookies.set("teacher_session", teacher.id, {
     httpOnly: true,
