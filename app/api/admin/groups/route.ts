@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/app/lib/prisma";
+import { getTeacher } from "@/app/lib/auth";
 import path from "path";
 import fs from "fs/promises";
 
@@ -21,6 +22,9 @@ async function saveImage(file: File): Promise<string> {
 
 export async function POST(req: NextRequest) {
   try {
+    const teacher = await getTeacher();
+    if (!teacher) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+
     const formData = await req.formData();
     const name = formData.get("name") as string;
     const groupType = (formData.get("type") as string) || "words";
@@ -28,12 +32,13 @@ export async function POST(req: NextRequest) {
     const wordCount = parseInt(formData.get("wordCount") as string, 10);
 
     const lastGroup = await prisma.wordGroup.findFirst({
+      where: { teacherId: teacher.id },
       orderBy: { order: "desc" },
     });
     const nextOrder = (lastGroup?.order ?? 0) + 1;
 
     const group = await prisma.wordGroup.create({
-      data: { name, groupType, targetLang, order: nextOrder },
+      data: { name, groupType, targetLang, order: nextOrder, teacherId: teacher.id },
     });
 
     for (let i = 0; i < wordCount; i++) {

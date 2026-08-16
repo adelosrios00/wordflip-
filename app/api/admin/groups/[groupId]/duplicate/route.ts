@@ -15,7 +15,10 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ gro
 
   if (!original) return NextResponse.json({ error: "Grupo no encontrado" }, { status: 404 });
 
-  const last = await prisma.wordGroup.findFirst({ orderBy: { order: "desc" } });
+  const last = await prisma.wordGroup.findFirst({
+    where: { teacherId: teacher.id },
+    orderBy: { order: "desc" },
+  });
   const nextOrder = (last?.order ?? 0) + 1;
 
   const newGroup = await prisma.wordGroup.create({
@@ -24,6 +27,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ gro
       groupType: original.groupType,
       targetLang: original.targetLang,
       order: nextOrder,
+      teacherId: teacher.id,
     },
   });
 

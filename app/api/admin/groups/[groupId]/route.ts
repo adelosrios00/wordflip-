@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/app/lib/prisma";
+import { getTeacher } from "@/app/lib/auth";
 import path from "path";
 import fs from "fs/promises";
 
@@ -18,17 +19,29 @@ interface Params {
 }
 
 export async function GET(_req: NextRequest, { params }: Params) {
+  const teacher = await getTeacher();
+  if (!teacher) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+
   const { groupId } = await params;
   const group = await prisma.wordGroup.findUnique({
     where: { id: groupId },
     include: { words: { orderBy: { order: "asc" } } },
   });
-  if (!group) return NextResponse.json({ error: "Not found" }, { status: 404 });
+  if (!group || (group.teacherId && group.teacherId !== teacher.id)) {
+    return NextResponse.json({ error: "Not found" }, { status: 404 });
+  }
   return NextResponse.json(group);
 }
 
 export async function PUT(req: NextRequest, { params }: Params) {
+  const teacher = await getTeacher();
+  if (!teacher) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+
   const { groupId } = await params;
+  const existing = await prisma.wordGroup.findUnique({ where: { id: groupId } });
+  if (!existing || (existing.teacherId && existing.teacherId !== teacher.id)) {
+    return NextResponse.json({ error: "No autorizado" }, { status: 403 });
+  }
   try {
     const formData = await req.formData();
     const name = formData.get("name") as string;
@@ -69,7 +82,14 @@ export async function PUT(req: NextRequest, { params }: Params) {
 }
 
 export async function DELETE(_req: NextRequest, { params }: Params) {
+  const teacher = await getTeacher();
+  if (!teacher) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+
   const { groupId } = await params;
+  const existing = await prisma.wordGroup.findUnique({ where: { id: groupId } });
+  if (!existing || (existing.teacherId && existing.teacherId !== teacher.id)) {
+    return NextResponse.json({ error: "No autorizado" }, { status: 403 });
+  }
   // Delete progress, words, class assignments, then the group
   await prisma.progress.deleteMany({ where: { wordGroupId: groupId } });
   await prisma.word.deleteMany({ where: { groupId } });

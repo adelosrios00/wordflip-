@@ -13,6 +13,7 @@ model Teacher {
   passwordHash String
   classes      Class[]
   invites      TeacherInvite[]
+  wordGroups   WordGroup[]
 }
 
 model TeacherInvite {
@@ -58,9 +59,11 @@ model Word {
 model WordGroup {
   id         String           @id @default(cuid())
   name       String
-  order      Int              @unique
+  order      Int
   groupType  String           @default("words") @map("type")
   targetLang String           @default("en")
+  teacherId  String?
+  teacher    Teacher?         @relation(fields: [teacherId], references: [id])
   words      Word[]
   progress   Progress[]
   classes    ClassWordGroup[]
