@@ -132,7 +132,7 @@ export function PracticeSession({ words, studentId, groupId, groupName, groupTyp
   const [scramPos, setScramPos] = useState(0);
   const [scramChars, setScramChars] = useState<{ ch: string; ok: boolean }[]>([]);
   const [scramFlash, setScramFlash] = useState(false);
-  const scramRef = useRef<HTMLDivElement>(null);
+  const scramRef = useRef<HTMLInputElement>(null);
 
   const [typVal, setTypVal] = useState("");
   const [typWrong, setTypWrong] = useState(false);
@@ -485,12 +485,31 @@ export function PracticeSession({ words, studentId, groupId, groupName, groupTyp
             <img src={word.imageUrl ?? FALLBACK_IMG} alt="" className="h-40 w-40 object-cover rounded-2xl shadow-md" />
           </div>
           <div className="text-center text-3xl font-semibold text-gray-500 mb-7">{word.english}</div>
-          <div
+          {/* Hidden real input — triggers iPad on-screen keyboard */}
+          <input
             ref={scramRef}
-            tabIndex={0}
-            onKeyDown={handleScrambleKey}
+            type="text"
+            inputMode="text"
+            autoComplete="off"
+            autoCorrect="off"
+            autoCapitalize="none"
+            spellCheck={false}
+            aria-hidden="true"
+            style={{ position: "fixed", opacity: 0, width: 1, height: 1, top: 0, left: 0, pointerEvents: "none" }}
+            onKeyDown={(e) => {
+              if (e.key.length === 1) { e.preventDefault(); handleScrambleChar(e.key); }
+            }}
+            onChange={(e) => {
+              const val = e.target.value;
+              if (val.length > 0) {
+                [...val].forEach((ch) => handleScrambleChar(ch));
+                e.target.value = "";
+              }
+            }}
+          />
+          <div
             onClick={() => scramRef.current?.focus()}
-            className="flex flex-wrap gap-2 justify-center mb-6 outline-none cursor-text"
+            className="flex flex-wrap gap-2 justify-center mb-6 cursor-text"
           >
             {scramChars.map((c, i) => {
               const isCurrent = i === scramPos;
@@ -520,7 +539,7 @@ export function PracticeSession({ words, studentId, groupId, groupName, groupTyp
               </button>
             ))}
           </div>
-          <p className="text-center text-gray-400 text-sm">Click on the first box and type on your keyboard</p>
+          <p className="text-center text-gray-400 text-sm">Tap the boxes and type</p>
         </div>
       )}
 
