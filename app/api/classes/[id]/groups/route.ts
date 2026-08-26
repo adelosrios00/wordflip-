@@ -10,6 +10,11 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     const { id: classId } = await params;
     const { wordGroupId, deadline } = await req.json();
 
+    const cls = await prisma.class.findUnique({ where: { id: classId } });
+    if (!cls || cls.teacherId !== teacher.id) {
+      return NextResponse.json({ error: "No autorizado" }, { status: 403 });
+    }
+
     const existing = await prisma.classWordGroup.findUnique({
       where: { classId_wordGroupId: { classId, wordGroupId } },
     });
@@ -38,6 +43,11 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
 
     const { id: classId } = await params;
     const { wordGroupId } = await req.json();
+
+    const cls = await prisma.class.findUnique({ where: { id: classId } });
+    if (!cls || cls.teacherId !== teacher.id) {
+      return NextResponse.json({ error: "No autorizado" }, { status: 403 });
+    }
 
     await prisma.classWordGroup.delete({
       where: { classId_wordGroupId: { classId, wordGroupId } },

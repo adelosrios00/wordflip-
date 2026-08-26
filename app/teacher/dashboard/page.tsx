@@ -19,7 +19,7 @@ export default async function TeacherDashboard() {
       orderBy: { name: "asc" },
     }),
     prisma.wordGroup.findMany({
-      where: { teacherId: teacher.id },
+      where: { OR: [{ teacherId: teacher.id }, { teacherId: null }] },
       orderBy: { order: "asc" },
       include: { _count: { select: { words: true } } },
     }),

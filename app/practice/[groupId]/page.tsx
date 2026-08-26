@@ -15,12 +15,11 @@ export default async function PracticePage({ params }: Props) {
   const { groupId } = await params;
 
   // Verify this group is assigned to the student's class
-  if (student.classId) {
-    const classGroup = await prisma.classWordGroup.findUnique({
-      where: { classId_wordGroupId: { classId: student.classId, wordGroupId: groupId } },
-    });
-    if (!classGroup) notFound();
-  }
+  if (!student.classId) redirect("/home");
+  const classGroup = await prisma.classWordGroup.findUnique({
+    where: { classId_wordGroupId: { classId: student.classId, wordGroupId: groupId } },
+  });
+  if (!classGroup) notFound();
 
   const group = await prisma.wordGroup.findUnique({
     where: { id: groupId },

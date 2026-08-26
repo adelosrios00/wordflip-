@@ -315,6 +315,7 @@ export function DemoSession({ words, groupId, groupName, groupType, targetLang }
             <div className="text-center mt-4 text-sm font-semibold">
               {typWrong && <p className="text-red-500">Incorrect, try again</p>}
               {typCorrect && <p className="text-emerald-600">Correct! ✓</p>}
+              <p className="text-amber-600 mt-1">Answer: <span className="font-bold">{word.english}</span></p>
             </div>
           </div>
         );
@@ -350,6 +351,7 @@ export function DemoSession({ words, groupId, groupName, groupType, targetLang }
             ))}
           </div>
           <p className="text-center text-gray-400 text-sm">Click on the first box and type on your keyboard</p>
+          <p className="text-center text-amber-600 text-sm font-semibold mt-2">Answer: <span className="font-bold">{word.spanish}</span></p>
         </div>
       )}
 
@@ -395,6 +397,7 @@ export function DemoSession({ words, groupId, groupName, groupType, targetLang }
             <div className="text-center mt-4 text-sm font-semibold">
               {typWrong && <p className="text-red-500">Incorrect, try again</p>}
               {typCorrect && <p className="text-emerald-600">Correct! ✓</p>}
+              <p className="text-amber-600 mt-1">Answer: <span className="font-bold">{word.spanish}</span></p>
             </div>
           </div>
         );

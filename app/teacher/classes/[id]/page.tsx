@@ -22,7 +22,7 @@ export default async function ClassPage({ params }: { params: Promise<{ id: stri
       },
     }),
     prisma.wordGroup.findMany({
-      where: { teacherId: teacher.id },
+      where: { OR: [{ teacherId: teacher.id }, { teacherId: null }] },
       orderBy: { order: "asc" },
       include: { _count: { select: { words: true } } },
     }),

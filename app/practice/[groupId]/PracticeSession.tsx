@@ -497,7 +497,17 @@ export function PracticeSession({ words, studentId, groupId, groupName, groupTyp
             aria-hidden="true"
             style={{ position: "fixed", opacity: 0, width: 1, height: 1, top: 0, left: 0, pointerEvents: "none" }}
             onKeyDown={(e) => {
-              if (e.key.length === 1) { e.preventDefault(); handleScrambleChar(e.key); }
+              if (e.key === "Backspace") {
+                e.preventDefault();
+                if (scramPos > 0) {
+                  const newPos = scramPos - 1;
+                  setScramChars((prev) => prev.map((c, i) => i === newPos ? { ch: "", ok: false } : c));
+                  setScramPos(newPos);
+                }
+              } else if (e.key.length === 1) {
+                e.preventDefault();
+                handleScrambleChar(e.key);
+              }
             }}
             onChange={(e) => {
               const val = e.target.value;
