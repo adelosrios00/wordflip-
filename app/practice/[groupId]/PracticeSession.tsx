@@ -258,7 +258,7 @@ export function PracticeSession({ words, studentId, groupId, groupName, groupTyp
     match_es_en:  `Phase 1 · Recognition ES → ${langCode}`,
     match_en_es:  `Phase 1 · Recognition ${langCode} → ES`,
     type_en:      `Phase 2 · Spell in ${langName}`,
-    unscramble:   `Phase 3 · Spell in Spanish`,
+    unscramble:   `Phase 3 · Spell in ${langName}`,
     type_es:      `Phase 3 · Spell in Spanish`,
     complete: "",
   };
@@ -539,7 +539,7 @@ export function PracticeSession({ words, studentId, groupId, groupName, groupTyp
             })}
           </div>
           <div className="flex flex-wrap gap-2 justify-center mb-3">
-            {sourceSpecialChars.map((ch) => (
+            {targetSpecialChars.map((ch) => (
               <button
                 key={ch}
                 onMouseDown={(e) => { e.preventDefault(); handleScrambleChar(ch); }}
