@@ -29,7 +29,10 @@ export default function NewClassPage() {
   const [classId, setClassId] = useState("");
 
   useEffect(() => {
-    fetch("/api/word-groups").then((r) => r.json()).then(setWordGroups);
+    fetch("/api/teacher/me").then((r) => {
+      if (!r.ok) { window.location.href = "/teacher/login"; return; }
+      fetch("/api/word-groups").then((r) => r.json()).then(setWordGroups);
+    });
   }, []);
 
   function toggleGroup(id: string) {
@@ -49,14 +52,10 @@ export default function NewClassPage() {
 
     setSaving(true);
 
-    // Get teacherId from session
-    const meRes = await fetch("/api/teacher/me");
-    const { teacherId } = await meRes.json();
-
     const res = await fetch("/api/classes", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name: className.trim(), teacherId, studentNames: names }),
+      body: JSON.stringify({ name: className.trim(), studentNames: names }),
     });
 
     if (!res.ok) {

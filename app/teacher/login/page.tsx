@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
@@ -10,13 +10,6 @@ export default function TeacherLogin() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [noTeacher, setNoTeacher] = useState(false);
-
-  useEffect(() => {
-    fetch("/api/teacher/exists").then((r) => r.json()).then((d) => {
-      if (!d.exists) setNoTeacher(true);
-    });
-  }, []);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -34,36 +27,6 @@ export default function TeacherLogin() {
       setError(d.error || "Incorrect username or password");
       setLoading(false);
     }
-  }
-
-  if (noTeacher) {
-    return (
-      <main className="min-h-screen bg-slate-50 flex items-center justify-center p-6">
-        <div className="w-full max-w-sm">
-          <Link href="/" className="inline-flex items-center gap-1.5 text-slate-400 hover:text-slate-600 text-sm mb-8 transition-colors">
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15 18l-6-6 6-6" />
-            </svg>
-            Back
-          </Link>
-          <div className="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm text-center">
-            <div className="w-12 h-12 rounded-2xl bg-violet-50 flex items-center justify-center text-violet-600 mx-auto mb-5">
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="1.75" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-              </svg>
-            </div>
-            <h1 className="text-xl font-bold text-slate-900 mb-2">First time here</h1>
-            <p className="text-slate-500 text-sm mb-6">Create your teacher account to start managing classes and students.</p>
-            <Link
-              href="/teacher/setup"
-              className="block w-full py-2.5 bg-violet-600 text-white font-semibold rounded-xl hover:bg-violet-700 transition-all text-sm"
-            >
-              Create teacher account
-            </Link>
-          </div>
-        </div>
-      </main>
-    );
   }
 
   return (

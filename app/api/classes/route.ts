@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/app/lib/prisma";
+import { getTeacher } from "@/app/lib/auth";
 
 function generatePassword(): string {
   const words = ["apple", "beach", "cloud", "dance", "eagle", "flame", "grape", "happy", "island", "lemon", "mango", "night", "ocean", "pizza", "queen", "river", "sugar", "tiger", "ultra", "vivid"];
@@ -20,21 +21,23 @@ function slugify(name: string): string {
 
 export async function POST(req: NextRequest) {
   try {
-    const { name, teacherId, studentNames } = await req.json() as {
+    const teacher = await getTeacher();
+    if (!teacher) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+
+    const { name, studentNames } = await req.json() as {
       name: string;
-      teacherId: string;
+      teacherId?: string;
       studentNames: string[];
     };
 
-    if (!name || !teacherId || !studentNames?.length) {
+    if (!name || !studentNames?.length) {
       return NextResponse.json({ error: "Datos incompletos" }, { status: 400 });
     }
 
     const cls = await prisma.class.create({
-      data: { name, teacherId },
+      data: { name, teacherId: teacher.id },
     });
 
-    // Get existing usernames to avoid duplicates
     const existingUsernames = new Set(
       (await prisma.student.findMany({ select: { username: true } }))
         .map((s) => s.username)
@@ -56,11 +59,19 @@ export async function POST(req: NextRequest) {
       const password = generatePassword();
       const cleanName = studentName.trim();
 
-      const student = await prisma.student.upsert({
-        where: { name: cleanName },
-        update: { username, password, classId: cls.id },
-        create: { name: cleanName, username, password, classId: cls.id },
-      });
+      // Neon HTTP no soporta upsert — findUnique + create/update
+      const existing = await prisma.student.findUnique({ where: { name: cleanName } });
+      let student;
+      if (existing) {
+        student = await prisma.student.update({
+          where: { name: cleanName },
+          data: { username, password, classId: cls.id },
+        });
+      } else {
+        student = await prisma.student.create({
+          data: { name: cleanName, username, password, classId: cls.id },
+        });
+      }
       students.push({ id: student.id, name: cleanName, username, password });
     }
 
@@ -71,12 +82,12 @@ export async function POST(req: NextRequest) {
   }
 }
 
-export async function GET(req: NextRequest) {
-  const teacherId = req.nextUrl.searchParams.get("teacherId");
-  if (!teacherId) return NextResponse.json({ error: "Falta teacherId" }, { status: 400 });
+export async function GET() {
+  const teacher = await getTeacher();
+  if (!teacher) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
 
   const classes = await prisma.class.findMany({
-    where: { teacherId },
+    where: { teacherId: teacher.id },
     include: {
       _count: { select: { students: true } },
       groups: { include: { wordGroup: true } },
