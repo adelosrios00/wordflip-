@@ -7,11 +7,11 @@ import Link from "next/link";
 type GroupType = "words" | "phrases";
 
 const LANGS = [
-  { code: "en", label: "Inglés", flag: "🇬🇧" },
-  { code: "fr", label: "Francés", flag: "🇫🇷" },
-  { code: "de", label: "Alemán", flag: "🇩🇪" },
-  { code: "it", label: "Italiano", flag: "🇮🇹" },
-  { code: "pt", label: "Portugués", flag: "🇵🇹" },
+  { code: "en", label: "English", flag: "🇬🇧" },
+  { code: "fr", label: "French", flag: "🇫🇷" },
+  { code: "de", label: "German", flag: "🇩🇪" },
+  { code: "it", label: "Italian", flag: "🇮🇹" },
+  { code: "pt", label: "Portuguese", flag: "🇵🇹" },
 ];
 
 interface WordEntry {
@@ -61,8 +61,8 @@ export default function NewGroupPage() {
     e.preventDefault();
     setError("");
     const filled = words.filter((w) => w.spanish.trim() && w.english.trim());
-    if (!groupName.trim()) { setError("El nombre del grupo es obligatorio."); return; }
-    if (filled.length === 0) { setError("Añade al menos una entrada."); return; }
+    if (!groupName.trim()) { setError("Group name is required."); return; }
+    if (filled.length === 0) { setError("Add at least one entry."); return; }
 
     setSaving(true);
     const formData = new FormData();
@@ -77,21 +77,23 @@ export default function NewGroupPage() {
     });
 
     const res = await fetch("/api/admin/groups", { method: "POST", body: formData });
-    if (res.ok) { router.push("/admin"); }
-    else { const d = await res.json(); setError(d.error || "Error al guardar"); setSaving(false); }
+    if (res.ok) { router.push("/teacher/dashboard"); }
+    else { const d = await res.json(); setError(d.error || "Error saving group"); setSaving(false); }
   }
+
+  const selectedLang = LANGS.find((l) => l.code === targetLang);
 
   return (
     <main className="max-w-3xl mx-auto px-6 py-10">
       <div className="flex items-center justify-between mb-8">
-        <h1 className="text-2xl font-bold tracking-tight text-slate-900">Nuevo grupo</h1>
-        <Link href="/admin" className="text-slate-400 hover:text-slate-600 text-sm transition-colors">← Cancelar</Link>
+        <h1 className="text-2xl font-bold tracking-tight text-slate-900">New group</h1>
+        <Link href="/teacher/dashboard" className="text-slate-400 hover:text-slate-600 text-sm transition-colors">← Cancel</Link>
       </div>
 
       <form onSubmit={handleSubmit}>
         {/* Type selector */}
         <div className="mb-7">
-          <label className="block text-sm font-semibold text-slate-500 uppercase tracking-widest mb-3">Tipo de grupo</label>
+          <label className="block text-sm font-semibold text-slate-500 uppercase tracking-widest mb-3">Group type</label>
           <div className="flex gap-3">
             <button
               type="button"
@@ -102,7 +104,7 @@ export default function NewGroupPage() {
                   : "border-slate-200 bg-white text-slate-500 hover:border-slate-300"
               }`}
             >
-              Palabras
+              Words
             </button>
             <button
               type="button"
@@ -113,14 +115,14 @@ export default function NewGroupPage() {
                   : "border-slate-200 bg-white text-slate-500 hover:border-slate-300"
               }`}
             >
-              Frases
+              Phrases
             </button>
           </div>
         </div>
 
-        {/* Idioma objetivo */}
+        {/* Target language */}
         <div className="mb-7">
-          <label className="block text-sm font-semibold text-slate-500 uppercase tracking-widest mb-3">Idioma a practicar</label>
+          <label className="block text-sm font-semibold text-slate-500 uppercase tracking-widest mb-3">Target language</label>
           <div className="flex flex-wrap gap-2">
             {LANGS.map((l) => (
               <button
@@ -141,12 +143,12 @@ export default function NewGroupPage() {
 
         {/* Group name */}
         <div className="mb-7">
-          <label className="block text-sm font-semibold text-slate-500 uppercase tracking-widest mb-2">Nombre del grupo</label>
+          <label className="block text-sm font-semibold text-slate-500 uppercase tracking-widest mb-2">Group name</label>
           <input
             type="text"
             value={groupName}
             onChange={(e) => setGroupName(e.target.value)}
-            placeholder={isWords ? "Ej: Vocabulario 1" : "Ej: Frases cotidianas"}
+            placeholder={isWords ? "E.g.: Vocabulary 1" : "E.g.: Everyday phrases"}
             className="w-full border border-slate-200 rounded-xl px-4 py-3 text-slate-900 placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all bg-slate-50"
           />
         </div>
@@ -157,7 +159,7 @@ export default function NewGroupPage() {
             <div key={i} className="bg-white border border-slate-200 rounded-xl p-4">
               <div className="flex items-center justify-between mb-3">
                 <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest">
-                  {isWords ? `Palabra ${i + 1}` : `Frase ${i + 1}`}
+                  {isWords ? `Word ${i + 1}` : `Phrase ${i + 1}`}
                 </p>
                 {words.length > 1 && (
                   <button
@@ -171,31 +173,31 @@ export default function NewGroupPage() {
               </div>
               <div className="grid grid-cols-2 gap-3 mb-3">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-500 mb-1">Español</label>
+                  <label className="block text-xs font-semibold text-slate-500 mb-1">Spanish</label>
                   <input
                     type="text"
                     value={w.spanish}
                     onChange={(e) => updateWord(i, "spanish", e.target.value)}
-                    placeholder={isWords ? "palabra en español" : "frase en español"}
+                    placeholder={isWords ? "word in Spanish" : "phrase in Spanish"}
                     className="w-full border border-slate-200 rounded-lg px-3 py-2 text-slate-900 placeholder:text-slate-400 focus:border-blue-400 focus:ring-1 focus:ring-blue-100 outline-none text-sm"
                   />
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-slate-500 mb-1">
-                    {LANGS.find((l) => l.code === targetLang)?.label ?? "Idioma"}
+                    {selectedLang?.label ?? "Target language"}
                   </label>
                   <input
                     type="text"
                     value={w.english}
                     onChange={(e) => updateWord(i, "english", e.target.value)}
-                    placeholder={isWords ? `palabra en ${LANGS.find(l=>l.code===targetLang)?.label}` : `frase en ${LANGS.find(l=>l.code===targetLang)?.label}`}
+                    placeholder={isWords ? `word in ${selectedLang?.label}` : `phrase in ${selectedLang?.label}`}
                     className="w-full border border-slate-200 rounded-lg px-3 py-2 text-slate-900 placeholder:text-slate-400 focus:border-blue-400 focus:ring-1 focus:ring-blue-100 outline-none text-sm"
                   />
                 </div>
               </div>
               <div className="flex items-center gap-3">
                 <label className="cursor-pointer px-3 py-1.5 bg-slate-100 hover:bg-slate-200 rounded-lg text-slate-600 font-medium transition-colors text-xs">
-                  Subir imagen
+                  Upload image
                   <input
                     type="file"
                     accept="image/*"
@@ -220,7 +222,7 @@ export default function NewGroupPage() {
           onClick={() => setWords((prev) => [...prev, emptyWord()])}
           className="mt-3 w-full py-3 border-2 border-dashed border-slate-200 rounded-xl text-slate-400 hover:border-blue-300 hover:text-blue-500 font-semibold transition-all text-sm"
         >
-          + Añadir {isWords ? "palabra" : "frase"}
+          + Add {isWords ? "word" : "phrase"}
         </button>
 
         {error && <p className="mt-5 text-center text-red-600 font-semibold text-sm">{error}</p>}
@@ -230,7 +232,7 @@ export default function NewGroupPage() {
           disabled={saving}
           className="mt-6 w-full font-bold py-4 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 disabled:opacity-50 transition-all shadow-sm"
         >
-          {saving ? "Guardando..." : "Guardar grupo"}
+          {saving ? "Saving..." : "Save group"}
         </button>
       </form>
     </main>
