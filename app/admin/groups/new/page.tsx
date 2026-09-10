@@ -7,7 +7,7 @@ import Link from "next/link";
 type GroupType = "words" | "phrases";
 
 const LANGS = [
-  { code: "en", label: "English", flag: "🇬🇧" },
+  { code: "es", label: "Spanish", flag: "🇪🇸" },
   { code: "fr", label: "French", flag: "🇫🇷" },
   { code: "de", label: "German", flag: "🇩🇪" },
   { code: "it", label: "Italian", flag: "🇮🇹" },
@@ -28,7 +28,7 @@ function emptyWord(): WordEntry {
 export default function NewGroupPage() {
   const router = useRouter();
   const [groupType, setGroupType] = useState<GroupType>("words");
-  const [targetLang, setTargetLang] = useState("en");
+  const [targetLang, setTargetLang] = useState("es");
   const [groupName, setGroupName] = useState("");
   const [words, setWords] = useState<WordEntry[]>(Array.from({ length: 5 }, emptyWord));
   const [saving, setSaving] = useState(false);
@@ -173,12 +173,12 @@ export default function NewGroupPage() {
               </div>
               <div className="grid grid-cols-2 gap-3 mb-3">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-500 mb-1">Spanish</label>
+                  <label className="block text-xs font-semibold text-slate-500 mb-1">English</label>
                   <input
                     type="text"
-                    value={w.spanish}
-                    onChange={(e) => updateWord(i, "spanish", e.target.value)}
-                    placeholder={isWords ? "word in Spanish" : "phrase in Spanish"}
+                    value={w.english}
+                    onChange={(e) => updateWord(i, "english", e.target.value)}
+                    placeholder={isWords ? "word in English" : "phrase in English"}
                     className="w-full border border-slate-200 rounded-lg px-3 py-2 text-slate-900 placeholder:text-slate-400 focus:border-blue-400 focus:ring-1 focus:ring-blue-100 outline-none text-sm"
                   />
                 </div>
@@ -188,8 +188,8 @@ export default function NewGroupPage() {
                   </label>
                   <input
                     type="text"
-                    value={w.english}
-                    onChange={(e) => updateWord(i, "english", e.target.value)}
+                    value={w.spanish}
+                    onChange={(e) => updateWord(i, "spanish", e.target.value)}
                     placeholder={isWords ? `word in ${selectedLang?.label}` : `phrase in ${selectedLang?.label}`}
                     className="w-full border border-slate-200 rounded-lg px-3 py-2 text-slate-900 placeholder:text-slate-400 focus:border-blue-400 focus:ring-1 focus:ring-blue-100 outline-none text-sm"
                   />
