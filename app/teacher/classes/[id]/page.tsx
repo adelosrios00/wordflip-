@@ -86,7 +86,7 @@ export default async function ClassPage({ params }: { params: Promise<{ id: stri
       <section className="mb-10">
         <h2 className="text-sm font-bold text-slate-500 uppercase tracking-widest mb-3">Alumnos</h2>
         <StudentManager classId={id} initial={cls.students.map((s) => ({
-          id: s.id, name: s.name, username: s.username ?? null, password: s.password ?? null,
+          id: s.id, name: s.name, username: s.username ?? null, password: null,
         }))} />
       </section>
 

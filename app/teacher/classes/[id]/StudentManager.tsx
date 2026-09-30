@@ -60,7 +60,7 @@ export function StudentManager({ classId, initial }: { classId: string; initial:
 
   function startEdit(s: Student) {
     setEditing(s.id);
-    setEditData({ name: s.name, username: s.username ?? "", password: s.password ?? "" });
+    setEditData({ name: s.name, username: s.username ?? "", password: "" });
     setEditError("");
   }
 
@@ -149,7 +149,7 @@ export function StudentManager({ classId, initial }: { classId: string; initial:
                         value={editData.password}
                         onChange={(e) => setEditData((p) => ({ ...p, password: e.target.value }))}
                         className="w-full border border-blue-300 rounded-lg px-2 py-1.5 font-mono text-emerald-700 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400"
-                        placeholder="contraseña"
+                        placeholder="New password (optional)"
                       />
                     </td>
                     <td className="px-3 py-2">
@@ -176,7 +176,7 @@ export function StudentManager({ classId, initial }: { classId: string; initial:
                   <tr key={s.id} className="hover:bg-slate-50 transition-colors">
                     <td className="px-5 py-3.5 font-bold text-slate-800">{s.name}</td>
                     <td className="px-5 py-3.5 font-mono text-blue-600 font-bold">{s.username ?? "—"}</td>
-                    <td className="px-5 py-3.5 font-mono text-emerald-600 font-bold">{s.password ?? "—"}</td>
+                    <td className="px-5 py-3.5 font-mono text-emerald-600 font-bold">{s.password ? s.password : "—"}</td>
                     <td className="px-3 py-3.5">
                       <div className="flex items-center gap-1">
                         <button

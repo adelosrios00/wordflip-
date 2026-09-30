@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/app/lib/prisma";
 import { getTeacher } from "@/app/lib/auth";
+import bcrypt from "bcryptjs";
 
 function makeUsername(name: string): string {
   return name
@@ -15,6 +16,11 @@ function makePassword(): string {
   const w1 = words[Math.floor(Math.random() * words.length)];
   const n = Math.floor(Math.random() * 90) + 10;
   return `${w1}${n}`;
+}
+
+async function verifyStudentInClass(studentId: string, classId: string): Promise<boolean> {
+  const student = await prisma.student.findUnique({ where: { id: studentId }, select: { classId: true } });
+  return student?.classId === classId;
 }
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -36,9 +42,10 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   }
 
   const password = makePassword();
+  const passwordHash = await bcrypt.hash(password, 10);
 
   const student = await prisma.student.create({
-    data: { name: name.trim(), username, password, classId },
+    data: { name: name.trim(), username, password: passwordHash, classId },
   });
 
   return NextResponse.json({ id: student.id, name: student.name, username, password });
@@ -55,14 +62,24 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   const { studentId, name, username, password } = await req.json();
   if (!studentId) return NextResponse.json({ error: "Falta studentId" }, { status: 400 });
 
+  if (!await verifyStudentInClass(studentId, classId)) {
+    return NextResponse.json({ error: "No autorizado" }, { status: 403 });
+  }
+
   const data: Record<string, string> = {};
   if (name?.trim()) data.name = name.trim();
   if (username?.trim()) data.username = username.trim().toLowerCase().replace(/\s+/g, ".");
-  if (password?.trim()) data.password = password.trim();
+  const newPlainPassword = password?.trim() || null;
+  if (newPlainPassword) data.password = await bcrypt.hash(newPlainPassword, 10);
 
   try {
     const updated = await prisma.student.update({ where: { id: studentId }, data });
-    return NextResponse.json({ id: updated.id, name: updated.name, username: updated.username, password: updated.password });
+    return NextResponse.json({
+      id: updated.id,
+      name: updated.name,
+      username: updated.username,
+      password: newPlainPassword,
+    });
   } catch {
     return NextResponse.json({ error: "El usuario ya existe" }, { status: 409 });
   }
@@ -77,6 +94,10 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
   if (!cls || cls.teacherId !== teacher.id) return NextResponse.json({ error: "No autorizado" }, { status: 403 });
 
   const { studentId } = await req.json();
+  if (!await verifyStudentInClass(studentId, classId)) {
+    return NextResponse.json({ error: "No autorizado" }, { status: 403 });
+  }
+
   await prisma.student.delete({ where: { id: studentId } });
   return NextResponse.json({ ok: true });
 }
