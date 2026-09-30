@@ -158,7 +158,7 @@ export function DemoSession({ words, groupId, groupName, groupType, targetLang }
     match_en_es: `Phase 1 · Recognition ${langCode} → ES`,
     type_en:     `Phase 2 · Spell in ${langName}`,
     unscramble:  `Phase 3 · Spell in ${langName}`,
-    type_es:     `Phase 3 · Spell in Spanish`,
+    type_es:     `Phase 3 · Spell in ${langName}`,
   };
 
   return (
@@ -195,8 +195,8 @@ export function DemoSession({ words, groupId, groupName, groupType, targetLang }
             {tab.id === "match_es_en" ? `Recognition ES→${langCode}` :
              tab.id === "match_en_es" ? `Recognition ${langCode}→ES` :
              tab.id === "type_en" ? `Spell in ${langName}` :
-             tab.id === "unscramble" ? "Spell in Spanish (letter)" :
-             "Spell in Spanish (free)"}
+             tab.id === "unscramble" ? `Spell in ${langName} (letter)` :
+             `Spell in ${langName} (free)`}
           </button>
         ))}
       </div>

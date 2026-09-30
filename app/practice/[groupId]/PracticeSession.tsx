@@ -259,7 +259,7 @@ export function PracticeSession({ words, studentId, groupId, groupName, groupTyp
     match_en_es:  `Phase 1 · Recognition ${langCode} → ES`,
     type_en:      `Phase 2 · Spell in ${langName}`,
     unscramble:   `Phase 3 · Spell in ${langName}`,
-    type_es:      `Phase 3 · Spell in Spanish`,
+    type_es:      `Phase 3 · Spell in ${langName}`,
     complete: "",
   };
 
