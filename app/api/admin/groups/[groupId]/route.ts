@@ -5,6 +5,11 @@ import path from "path";
 import fs from "fs/promises";
 
 async function saveImage(file: File): Promise<string> {
+  if (process.env.BLOB_READ_WRITE_TOKEN) {
+    const { put } = await import("@vercel/blob");
+    const blob = await put(file.name, file, { access: "public" });
+    return blob.url;
+  }
   const uploadDir = path.join(process.cwd(), "public", "uploads");
   await fs.mkdir(uploadDir, { recursive: true });
   const ext = file.name.split(".").pop() ?? "jpg";
@@ -49,7 +54,6 @@ export async function PUT(req: NextRequest, { params }: Params) {
 
     await prisma.wordGroup.update({ where: { id: groupId }, data: { name } });
 
-    // Delete old words and recreate
     await prisma.word.deleteMany({ where: { groupId } });
 
     for (let i = 0; i < wordCount; i++) {
@@ -64,13 +68,7 @@ export async function PUT(req: NextRequest, { params }: Params) {
       }
 
       await prisma.word.create({
-        data: {
-          spanish,
-          english,
-          imageUrl,
-          order: i + 1,
-          groupId,
-        },
+        data: { spanish, english, imageUrl, order: i + 1, groupId },
       });
     }
 
@@ -90,7 +88,6 @@ export async function DELETE(_req: NextRequest, { params }: Params) {
   if (!existing || (existing.teacherId && existing.teacherId !== teacher.id)) {
     return NextResponse.json({ error: "No autorizado" }, { status: 403 });
   }
-  // Delete progress, words, class assignments, then the group
   await prisma.progress.deleteMany({ where: { wordGroupId: groupId } });
   await prisma.word.deleteMany({ where: { groupId } });
   await prisma.classWordGroup.deleteMany({ where: { wordGroupId: groupId } });

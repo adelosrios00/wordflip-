@@ -14,6 +14,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ gro
   });
 
   if (!original) return NextResponse.json({ error: "Grupo no encontrado" }, { status: 404 });
+  if (original.teacherId && original.teacherId !== teacher.id) {
+    return NextResponse.json({ error: "No autorizado" }, { status: 403 });
+  }
 
   const last = await prisma.wordGroup.findFirst({
     where: { teacherId: teacher.id },

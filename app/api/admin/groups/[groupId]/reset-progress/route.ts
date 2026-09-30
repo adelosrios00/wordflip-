@@ -13,12 +13,20 @@ export async function DELETE(req: NextRequest, { params }: Params) {
   const { groupId } = await params;
   const classId = req.nextUrl.searchParams.get("classId");
 
+  const group = await prisma.wordGroup.findUnique({ where: { id: groupId } });
+  if (!group || (group.teacherId && group.teacherId !== teacher.id)) {
+    return NextResponse.json({ error: "No autorizado" }, { status: 403 });
+  }
+
   if (classId) {
     const cls = await prisma.class.findUnique({
       where: { id: classId },
-      select: { students: { select: { id: true } } },
+      select: { teacherId: true, students: { select: { id: true } } },
     });
-    const studentIds = cls?.students.map((s) => s.id) ?? [];
+    if (!cls || cls.teacherId !== teacher.id) {
+      return NextResponse.json({ error: "No autorizado" }, { status: 403 });
+    }
+    const studentIds = cls.students.map((s) => s.id);
     await prisma.progress.deleteMany({
       where: { wordGroupId: groupId, studentId: { in: studentIds } },
     });

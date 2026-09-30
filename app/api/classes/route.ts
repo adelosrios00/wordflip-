@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/app/lib/prisma";
 import { getTeacher } from "@/app/lib/auth";
+import bcrypt from "bcryptjs";
 
 function generatePassword(): string {
   const words = ["apple", "beach", "cloud", "dance", "eagle", "flame", "grape", "happy", "island", "lemon", "mango", "night", "ocean", "pizza", "queen", "river", "sugar", "tiger", "ultra", "vivid"];
@@ -57,6 +58,7 @@ export async function POST(req: NextRequest) {
       existingUsernames.add(username);
 
       const password = generatePassword();
+      const passwordHash = await bcrypt.hash(password, 10);
       const cleanName = studentName.trim();
 
       // Neon HTTP no soporta upsert — findUnique + create/update
@@ -65,11 +67,11 @@ export async function POST(req: NextRequest) {
       if (existing) {
         student = await prisma.student.update({
           where: { name: cleanName },
-          data: { username, password, classId: cls.id },
+          data: { username, password: passwordHash, classId: cls.id },
         });
       } else {
         student = await prisma.student.create({
-          data: { name: cleanName, username, password, classId: cls.id },
+          data: { name: cleanName, username, password: passwordHash, classId: cls.id },
         });
       }
       students.push({ id: student.id, name: cleanName, username, password });

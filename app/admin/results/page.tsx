@@ -1,28 +1,38 @@
 export const dynamic = 'force-dynamic';
+import { getTeacher } from "@/app/lib/auth";
 import { prisma } from "@/app/lib/prisma";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 
 export default async function ResultsPage() {
+  const teacher = await getTeacher();
+  if (!teacher) redirect("/teacher/login");
+
+  const teacherClasses = await prisma.class.findMany({
+    where: { teacherId: teacher.id },
+    select: { id: true },
+  });
+  const classIds = teacherClasses.map((c) => c.id);
+
   const [students, groups] = await Promise.all([
-    prisma.student.findMany({ orderBy: { name: "asc" } }),
+    prisma.student.findMany({
+      where: { classId: { in: classIds } },
+      orderBy: { name: "asc" },
+    }),
     prisma.wordGroup.findMany({
+      where: { OR: [{ teacherId: teacher.id }, { teacherId: null }] },
       orderBy: { order: "asc" },
       include: { _count: { select: { words: true } } },
     }),
   ]);
 
-  // Get all progress entries grouped by student + group
   const allProgress = await prisma.progress.groupBy({
     by: ["studentId", "wordGroupId"],
     _count: { _all: true },
   });
 
-  // Map: "studentId:groupId" → count
   const progressMap = new Map(
-    allProgress.map((p) => [
-      `${p.studentId}:${p.wordGroupId}`,
-      p._count._all,
-    ])
+    allProgress.map((p) => [`${p.studentId}:${p.wordGroupId}`, p._count._all])
   );
 
   function getMastery(studentId: string, groupId: string, wordCount: number) {
@@ -33,12 +43,12 @@ export default async function ResultsPage() {
   return (
     <main className="max-w-4xl mx-auto p-8">
       <div className="flex items-center justify-between mb-8">
-        <h1 className="text-3xl font-bold text-gray-800">Resultados de alumnos</h1>
-        <Link href="/admin" className="text-gray-500 hover:text-gray-700">← Panel</Link>
+        <h1 className="text-3xl font-bold text-gray-800">Student results</h1>
+        <Link href="/teacher/dashboard" className="text-gray-500 hover:text-gray-700">← Dashboard</Link>
       </div>
 
       {students.length === 0 ? (
-        <p className="text-center text-gray-400 text-xl mt-12">Todavía no hay alumnos registrados.</p>
+        <p className="text-center text-gray-400 text-xl mt-12">No students yet.</p>
       ) : (
         <div className="flex flex-col gap-8">
           {students.map((student) => {
@@ -49,24 +59,22 @@ export default async function ResultsPage() {
 
             return (
               <div key={student.id} className="bg-white rounded-2xl border-2 border-gray-200 shadow-sm overflow-hidden">
-                {/* Student header */}
                 <div className="flex items-center justify-between px-6 py-4 bg-gray-50 border-b border-gray-200">
                   <h2 className="text-2xl font-bold text-gray-800">{student.name}</h2>
                   <span className="text-base font-semibold text-gray-500">
-                    {completed} / {total} grupos completados
+                    {completed} / {total} groups completed
                   </span>
                 </div>
 
-                {/* Groups table */}
                 {groups.length === 0 ? (
-                  <p className="p-6 text-gray-400">No hay grupos todavía.</p>
+                  <p className="p-6 text-gray-400">No groups yet.</p>
                 ) : (
                   <table className="w-full">
                     <thead>
                       <tr className="text-left text-sm font-semibold text-gray-400 uppercase tracking-wide">
-                        <th className="px-6 py-3">Grupo</th>
-                        <th className="px-6 py-3">Tipo</th>
-                        <th className="px-6 py-3">Progreso</th>
+                        <th className="px-6 py-3">Group</th>
+                        <th className="px-6 py-3">Type</th>
+                        <th className="px-6 py-3">Progress</th>
                         <th className="px-6 py-3 text-right">%</th>
                       </tr>
                     </thead>
@@ -84,7 +92,7 @@ export default async function ResultsPage() {
                                   ? "bg-purple-100 text-purple-700"
                                   : "bg-blue-100 text-blue-700"
                               }`}>
-                                {group.groupType === "phrases" ? "Frases" : "Palabras"}
+                                {group.groupType === "phrases" ? "Phrases" : "Words"}
                               </span>
                             </td>
                             <td className="px-6 py-4">

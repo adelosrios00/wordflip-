@@ -45,7 +45,6 @@ export default function EditGroupPage({ params }: Props) {
             imagePreview: null,
             existingImageUrl: w.imageUrl,
           }));
-          // Start with existing words; if none yet, show 5 empty slots
           setWords(loaded.length > 0 ? loaded : Array.from({ length: 5 }, emptyWord));
           setLoading(false);
         });
@@ -77,7 +76,7 @@ export default function EditGroupPage({ params }: Props) {
     setError("");
     const filledWords = words.filter((w) => w.spanish.trim() && w.english.trim());
     if (!groupName.trim()) {
-      setError("El nombre del grupo es obligatorio.");
+      setError("Group name is required.");
       return;
     }
     setSaving(true);
@@ -103,7 +102,7 @@ export default function EditGroupPage({ params }: Props) {
       router.push("/teacher/dashboard");
     } else {
       const data = await res.json();
-      setError(data.error || "Error al guardar");
+      setError(data.error || "Error saving group");
       setSaving(false);
     }
   }
@@ -111,7 +110,7 @@ export default function EditGroupPage({ params }: Props) {
   if (loading) {
     return (
       <main className="max-w-3xl mx-auto p-8 text-center">
-        <p className="text-xl text-gray-500">Cargando...</p>
+        <p className="text-xl text-gray-500">Loading...</p>
       </main>
     );
   }
@@ -119,16 +118,16 @@ export default function EditGroupPage({ params }: Props) {
   return (
     <main className="max-w-3xl mx-auto p-8">
       <div className="flex items-center justify-between mb-8">
-        <h1 className="text-3xl font-bold text-gray-800">Editar grupo</h1>
+        <h1 className="text-3xl font-bold text-gray-800">Edit group</h1>
         <Link href="/teacher/dashboard" className="text-gray-500 hover:text-gray-700">
-          ← Cancelar
+          ← Cancel
         </Link>
       </div>
 
       <form onSubmit={handleSubmit}>
         <div className="mb-8">
           <label className="block text-lg font-semibold text-gray-700 mb-2">
-            Nombre del grupo
+            Group name
           </label>
           <input
             type="text"
@@ -142,29 +141,19 @@ export default function EditGroupPage({ params }: Props) {
           {words.map((word, i) => (
             <div key={i} className="bg-white border-2 border-gray-200 rounded-2xl p-5 relative">
               <div className="flex items-center justify-between mb-3">
-                <p className="text-sm font-semibold text-gray-400">Palabra {i + 1}</p>
+                <p className="text-sm font-semibold text-gray-400">Word {i + 1}</p>
                 {words.length > 1 && (
                   <button
                     type="button"
                     onClick={() => removeWord(i)}
                     className="text-gray-300 hover:text-red-400 transition-colors text-xl leading-none font-bold"
-                    title="Eliminar"
+                    title="Remove"
                   >
                     ×
                   </button>
                 )}
               </div>
               <div className="grid grid-cols-2 gap-4 mb-4">
-                <div>
-                  <label className="block text-sm font-semibold text-gray-600 mb-1">Español</label>
-                  <input
-                    type="text"
-                    value={word.spanish}
-                    onChange={(e) => updateWord(i, "spanish", e.target.value)}
-                    placeholder="palabra en español"
-                    className="w-full text-lg border-2 border-gray-200 rounded-xl px-3 py-2 focus:border-blue-400 focus:outline-none"
-                  />
-                </div>
                 <div>
                   <label className="block text-sm font-semibold text-gray-600 mb-1">English</label>
                   <input
@@ -175,10 +164,20 @@ export default function EditGroupPage({ params }: Props) {
                     className="w-full text-lg border-2 border-gray-200 rounded-xl px-3 py-2 focus:border-blue-400 focus:outline-none"
                   />
                 </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-600 mb-1">Spanish / Target</label>
+                  <input
+                    type="text"
+                    value={word.spanish}
+                    onChange={(e) => updateWord(i, "spanish", e.target.value)}
+                    placeholder="word in target language"
+                    className="w-full text-lg border-2 border-gray-200 rounded-xl px-3 py-2 focus:border-blue-400 focus:outline-none"
+                  />
+                </div>
               </div>
               <div className="flex items-center gap-4">
                 <label className="cursor-pointer px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-xl text-gray-700 font-medium transition-colors">
-                  📷 {word.existingImageUrl || word.imagePreview ? "Cambiar imagen" : "Subir imagen"}
+                  📷 {word.existingImageUrl || word.imagePreview ? "Change image" : "Upload image"}
                   <input
                     type="file"
                     accept="image/*"
@@ -201,13 +200,12 @@ export default function EditGroupPage({ params }: Props) {
           ))}
         </div>
 
-        {/* Add word button */}
         <button
           type="button"
           onClick={addWord}
           className="mt-4 w-full py-3 border-2 border-dashed border-gray-300 rounded-2xl text-gray-400 hover:border-blue-400 hover:text-blue-500 font-bold text-lg transition-all"
         >
-          + Añadir palabra
+          + Add word
         </button>
 
         {error && (
@@ -219,7 +217,7 @@ export default function EditGroupPage({ params }: Props) {
           disabled={saving}
           className="mt-6 w-full text-xl font-bold py-5 bg-green-500 text-white rounded-2xl hover:bg-green-600 disabled:opacity-50 transition-all shadow-sm"
         >
-          {saving ? "Guardando..." : "Guardar cambios"}
+          {saving ? "Saving..." : "Save changes"}
         </button>
       </form>
     </main>
