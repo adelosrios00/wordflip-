@@ -44,9 +44,21 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   const password = makePassword();
   const passwordHash = await bcrypt.hash(password, 10);
 
-  const student = await prisma.student.create({
-    data: { name: name.trim(), username, password: passwordHash, classId },
-  });
+  let student;
+  try {
+    student = await prisma.student.create({
+      data: { name: name.trim(), username, password: passwordHash, classId },
+    });
+  } catch (e: unknown) {
+    const err = e as { code?: string };
+    if (err.code === "P2002") {
+      return NextResponse.json(
+        { error: `A student named "${name.trim()}" already exists. Add a last name or initial to make it unique.` },
+        { status: 409 }
+      );
+    }
+    return NextResponse.json({ error: "Error creating student" }, { status: 500 });
+  }
 
   return NextResponse.json({ id: student.id, name: student.name, username, password });
 }

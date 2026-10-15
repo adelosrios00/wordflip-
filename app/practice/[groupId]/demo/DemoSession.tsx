@@ -24,6 +24,7 @@ const FALLBACK_IMG = "/no-image.svg";
 
 function getLangName(code: string) {
   switch (code) {
+    case "es": return "Spanish";
     case "fr": return "French";
     case "de": return "German";
     case "it": return "Italian";
@@ -33,7 +34,7 @@ function getLangName(code: string) {
 }
 
 function getLangCode(code: string) {
-  return { fr: "FR", de: "DE", it: "IT", pt: "PT" }[code] ?? "EN";
+  return { es: "ES", fr: "FR", de: "DE", it: "IT", pt: "PT" }[code] ?? "EN";
 }
 
 function getSpecialChars(lang: string): string[] {
@@ -102,7 +103,7 @@ export function DemoSession({ words, groupId, groupName, groupType, targetLang }
     }
     if (phase === "unscramble") {
       setScramPos(0);
-      setScramChars(word.spanish.split("").map(() => ({ ch: "", ok: false })));
+      setScramChars(word.spanish.normalize("NFC").split("").map(() => ({ ch: "", ok: false })));
       setTimeout(() => scramRef.current?.focus(), 80);
     }
     if (phase === "type_en" || phase === "type_es") {
@@ -125,8 +126,9 @@ export function DemoSession({ words, groupId, groupName, groupType, targetLang }
   }
 
   function handleScrambleChar(ch: string) {
-    if (scramPos >= word.spanish.length) return;
-    const expected = word.spanish[scramPos];
+    const scramWord = word.spanish.normalize("NFC");
+    if (scramPos >= scramWord.length) return;
+    const expected = scramWord[scramPos];
     if (ch.toLowerCase() === expected.toLowerCase() || ch === expected) {
       const newChars = scramChars.map((c, i) => i === scramPos ? { ch: expected, ok: true } : c);
       setScramChars(newChars);
@@ -154,9 +156,9 @@ export function DemoSession({ words, groupId, groupName, groupType, targetLang }
   }
 
   const phaseLabel: Record<Phase, string> = {
-    match_es_en: `Phase 1 · Recognition ES → ${langCode}`,
-    match_en_es: `Phase 1 · Recognition ${langCode} → ES`,
-    type_en:     `Phase 2 · Spell in ${langName}`,
+    match_es_en: `Phase 1 · Recognition ${langCode} → EN`,
+    match_en_es: `Phase 1 · Recognition EN → ${langCode}`,
+    type_en:     "Phase 2 · Spell in English",
     unscramble:  `Phase 3 · Spell in ${langName}`,
     type_es:     `Phase 3 · Spell in ${langName}`,
   };
@@ -192,9 +194,9 @@ export function DemoSession({ words, groupId, groupName, groupType, targetLang }
                 : "bg-white border border-slate-200 text-slate-500 hover:border-blue-300 hover:text-blue-600"
             }`}
           >
-            {tab.id === "match_es_en" ? `Recognition ES→${langCode}` :
-             tab.id === "match_en_es" ? `Recognition ${langCode}→ES` :
-             tab.id === "type_en" ? `Spell in ${langName}` :
+            {tab.id === "match_es_en" ? `Recognition ${langCode}→EN` :
+             tab.id === "match_en_es" ? `Recognition EN→${langCode}` :
+             tab.id === "type_en" ? "Spell in English" :
              tab.id === "unscramble" ? `Spell in ${langName} (letter)` :
              `Spell in ${langName} (free)`}
           </button>
@@ -282,7 +284,7 @@ export function DemoSession({ words, groupId, groupName, groupType, targetLang }
               <img src={word.imageUrl ?? FALLBACK_IMG} alt="" className="h-32 w-32 object-cover rounded-2xl shadow-md" />
             </div>
             <div className={`text-center font-bold text-gray-800 mb-2 leading-snug break-words px-2 ${promptSize}`}>{prompt}</div>
-            <p className="text-center text-sm text-gray-400 mb-5">Write in {langName}</p>
+            <p className="text-center text-sm text-gray-400 mb-5">Write in English</p>
             <form onSubmit={handleTypingSubmit} className="flex gap-3 max-w-md mx-auto">
               <input ref={typRef} type="text" value={typVal}
                 onChange={(e) => { setTypVal(e.target.value); if (typWrong) setTypWrong(false); }}
@@ -294,24 +296,6 @@ export function DemoSession({ words, groupId, groupName, groupType, targetLang }
               />
               <button type="submit" className="text-2xl font-bold px-6 py-4 bg-emerald-500 text-white rounded-2xl hover:bg-emerald-600 active:scale-95 transition-all shadow-sm">✓</button>
             </form>
-            {targetSpecialChars.length > 0 && (
-              <div className="flex flex-wrap gap-2 justify-center mt-3 max-w-md mx-auto">
-                {targetSpecialChars.map((ch) => (
-                  <button key={ch} type="button"
-                    onMouseDown={(e) => {
-                      e.preventDefault();
-                      const input = typRef.current; if (!input) return;
-                      const start = input.selectionStart ?? typVal.length;
-                      const end = input.selectionEnd ?? typVal.length;
-                      const newVal = typVal.slice(0, start) + ch + typVal.slice(end);
-                      setTypVal(newVal);
-                      setTimeout(() => { input.focus(); input.setSelectionRange(start+1, start+1); }, 0);
-                    }}
-                    className="px-3 py-2 text-base font-bold bg-gray-100 hover:bg-yellow-100 hover:border-yellow-400 rounded-xl border-2 border-gray-300 transition-all"
-                  >{ch}</button>
-                ))}
-              </div>
-            )}
             <div className="text-center mt-4 text-sm font-semibold">
               {typWrong && <p className="text-red-500">Incorrect, try again</p>}
               {typCorrect && <p className="text-emerald-600">Correct! ✓</p>}
@@ -344,8 +328,10 @@ export function DemoSession({ words, groupId, groupName, groupType, targetLang }
           </div>
           <div className="flex flex-wrap gap-2 justify-center mb-3">
             {targetSpecialChars.map((ch) => (
-              <button key={ch} onMouseDown={(e) => { e.preventDefault(); handleScrambleChar(ch); }}
-                className="px-3 py-2 text-lg font-bold bg-gray-100 hover:bg-yellow-100 hover:border-yellow-400 rounded-xl border-2 border-gray-300 transition-all">
+              <button key={ch}
+                onPointerDown={(e) => { e.preventDefault(); handleScrambleChar(ch); }}
+                onContextMenu={(e) => e.preventDefault()}
+                className="px-3 py-2 text-lg font-bold bg-gray-100 hover:bg-yellow-100 hover:border-yellow-400 rounded-xl border-2 border-gray-300 transition-all select-none">
                 {ch}
               </button>
             ))}
@@ -366,7 +352,7 @@ export function DemoSession({ words, groupId, groupName, groupType, targetLang }
               <img src={word.imageUrl ?? FALLBACK_IMG} alt="" className="h-32 w-32 object-cover rounded-2xl shadow-md" />
             </div>
             <div className={`text-center font-bold text-gray-800 mb-2 leading-snug break-words px-2 ${promptSize}`}>{prompt}</div>
-            <p className="text-center text-sm text-gray-400 mb-5">Write in Spanish</p>
+            <p className="text-center text-sm text-gray-400 mb-5">Write in {langName}</p>
             <form onSubmit={handleTypingSubmit} className="flex gap-3 max-w-md mx-auto">
               <input ref={typRef} type="text" value={typVal}
                 onChange={(e) => { setTypVal(e.target.value); if (typWrong) setTypWrong(false); }}
@@ -379,9 +365,9 @@ export function DemoSession({ words, groupId, groupName, groupType, targetLang }
               <button type="submit" className="text-2xl font-bold px-6 py-4 bg-emerald-500 text-white rounded-2xl hover:bg-emerald-600 active:scale-95 transition-all shadow-sm">✓</button>
             </form>
             <div className="flex flex-wrap gap-2 justify-center mt-3 max-w-md mx-auto">
-              {sourceSpecialChars.map((ch) => (
+              {targetSpecialChars.map((ch) => (
                 <button key={ch} type="button"
-                  onMouseDown={(e) => {
+                  onPointerDown={(e) => {
                     e.preventDefault();
                     const input = typRef.current; if (!input) return;
                     const start = input.selectionStart ?? typVal.length;
@@ -390,7 +376,8 @@ export function DemoSession({ words, groupId, groupName, groupType, targetLang }
                     setTypVal(newVal);
                     setTimeout(() => { input.focus(); input.setSelectionRange(start+1, start+1); }, 0);
                   }}
-                  className="px-3 py-2 text-base font-bold bg-gray-100 hover:bg-yellow-100 hover:border-yellow-400 rounded-xl border-2 border-gray-300 transition-all"
+                  onContextMenu={(e) => e.preventDefault()}
+                  className="px-3 py-2 text-base font-bold bg-gray-100 hover:bg-yellow-100 hover:border-yellow-400 rounded-xl border-2 border-gray-300 transition-all select-none"
                 >{ch}</button>
               ))}
             </div>

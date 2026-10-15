@@ -53,6 +53,7 @@ function loadLocal(sid: string, gid: string): Set<string> {
 
 function getLangName(code: string): string {
   switch (code) {
+    case "es": return "Spanish";
     case "fr": return "French";
     case "de": return "German";
     case "it": return "Italian";
@@ -63,6 +64,7 @@ function getLangName(code: string): string {
 
 function getLangCode(code: string): string {
   switch (code) {
+    case "es": return "ES";
     case "fr": return "FR";
     case "de": return "DE";
     case "it": return "IT";
@@ -153,7 +155,7 @@ export function PracticeSession({ words, studentId, groupId, groupName, groupTyp
     }
     if (phase === "unscramble") {
       setScramPos(0);
-      setScramChars(word.spanish.split("").map(() => ({ ch: "", ok: false })));
+      setScramChars(word.spanish.normalize("NFC").split("").map(() => ({ ch: "", ok: false })));
       setTimeout(() => scramRef.current?.focus(), 80);
     }
     if (phase === "type_en" || phase === "type_es") {
@@ -191,8 +193,9 @@ export function PracticeSession({ words, studentId, groupId, groupName, groupTyp
   }
 
   function handleScrambleChar(ch: string) {
-    if (scramPos >= word.spanish.length) return;
-    const expected = word.spanish[scramPos];
+    const scramWord = word.spanish.normalize("NFC");
+    if (scramPos >= scramWord.length) return;
+    const expected = scramWord[scramPos];
     if (ch.toLowerCase() === expected.toLowerCase() || ch === expected) {
       const newChars = scramChars.map((c, i) => i === scramPos ? { ch: expected, ok: true } : c);
       setScramChars(newChars);
@@ -255,9 +258,9 @@ export function PracticeSession({ words, studentId, groupId, groupName, groupTyp
   const targetSpecialChars = getSpecialChars(targetLang);
 
   const phaseLabel: Record<Phase, string> = {
-    match_es_en:  `Phase 1 · Recognition ES → ${langCode}`,
-    match_en_es:  `Phase 1 · Recognition ${langCode} → ES`,
-    type_en:      `Phase 2 · Spell in ${langName}`,
+    match_es_en:  `Phase 1 · Recognition ${langCode} → EN`,
+    match_en_es:  `Phase 1 · Recognition EN → ${langCode}`,
+    type_en:      "Phase 2 · Spell in English",
     unscramble:   `Phase 3 · Spell in ${langName}`,
     type_es:      `Phase 3 · Spell in ${langName}`,
     complete: "",
@@ -422,7 +425,7 @@ export function PracticeSession({ words, studentId, groupId, groupName, groupTyp
               {prompt}
             </div>
             <p className="text-center text-sm text-gray-400 mb-5">
-              Write in {langName}
+              Write in English
             </p>
             <form onSubmit={handleTypingSubmit} className="flex gap-3 max-w-md mx-auto">
               <input
@@ -444,30 +447,6 @@ export function PracticeSession({ words, studentId, groupId, groupName, groupTyp
                 ✓
               </button>
             </form>
-            {targetSpecialChars.length > 0 && (
-              <div className="flex flex-wrap gap-2 justify-center mt-3 max-w-md mx-auto">
-                {targetSpecialChars.map((ch) => (
-                  <button
-                    key={ch}
-                    type="button"
-                    onMouseDown={(e) => {
-                      e.preventDefault();
-                      const input = typRef.current;
-                      if (!input) return;
-                      const start = input.selectionStart ?? typVal.length;
-                      const end = input.selectionEnd ?? typVal.length;
-                      const newVal = typVal.slice(0, start) + ch + typVal.slice(end);
-                      setTypVal(newVal);
-                      if (typWrong) setTypWrong(false);
-                      setTimeout(() => { input.focus(); input.setSelectionRange(start + 1, start + 1); }, 0);
-                    }}
-                    className="px-3 py-2 text-base font-bold bg-gray-100 hover:bg-yellow-100 hover:border-yellow-400 rounded-xl border-2 border-gray-300 transition-all"
-                  >
-                    {ch}
-                  </button>
-                ))}
-              </div>
-            )}
             {typWrong && (
               <p className="text-red-500 font-semibold text-sm text-center mt-4">Incorrect, try again</p>
             )}
@@ -542,8 +521,9 @@ export function PracticeSession({ words, studentId, groupId, groupName, groupTyp
             {targetSpecialChars.map((ch) => (
               <button
                 key={ch}
-                onMouseDown={(e) => { e.preventDefault(); handleScrambleChar(ch); }}
-                className="px-3 py-2 text-lg font-bold bg-gray-100 hover:bg-yellow-100 hover:border-yellow-400 rounded-xl border-2 border-gray-300 transition-all"
+                onPointerDown={(e) => { e.preventDefault(); handleScrambleChar(ch); }}
+                onContextMenu={(e) => e.preventDefault()}
+                className="px-3 py-2 text-lg font-bold bg-gray-100 hover:bg-yellow-100 hover:border-yellow-400 rounded-xl border-2 border-gray-300 transition-all select-none"
               >
                 {ch}
               </button>
@@ -567,7 +547,7 @@ export function PracticeSession({ words, studentId, groupId, groupName, groupTyp
             <div className={`text-center font-bold text-gray-800 mb-2 leading-snug break-words px-2 ${promptSize}`}>
               {prompt}
             </div>
-            <p className="text-center text-sm text-gray-400 mb-5">Write in Spanish</p>
+            <p className="text-center text-sm text-gray-400 mb-5">Write in {langName}</p>
             <form onSubmit={handleTypingSubmit} className="flex gap-3 max-w-md mx-auto">
               <input
                 ref={typRef}
@@ -589,11 +569,11 @@ export function PracticeSession({ words, studentId, groupId, groupName, groupTyp
               </button>
             </form>
             <div className="flex flex-wrap gap-2 justify-center mt-3 max-w-md mx-auto">
-              {sourceSpecialChars.map((ch) => (
+              {targetSpecialChars.map((ch) => (
                 <button
                   key={ch}
                   type="button"
-                  onMouseDown={(e) => {
+                  onPointerDown={(e) => {
                     e.preventDefault();
                     const input = typRef.current;
                     if (!input) return;
@@ -604,7 +584,8 @@ export function PracticeSession({ words, studentId, groupId, groupName, groupTyp
                     if (typWrong) setTypWrong(false);
                     setTimeout(() => { input.focus(); input.setSelectionRange(start + 1, start + 1); }, 0);
                   }}
-                  className="px-3 py-2 text-base font-bold bg-gray-100 hover:bg-yellow-100 hover:border-yellow-400 rounded-xl border-2 border-gray-300 transition-all"
+                  onContextMenu={(e) => e.preventDefault()}
+                  className="px-3 py-2 text-base font-bold bg-gray-100 hover:bg-yellow-100 hover:border-yellow-400 rounded-xl border-2 border-gray-300 transition-all select-none"
                 >
                   {ch}
                 </button>

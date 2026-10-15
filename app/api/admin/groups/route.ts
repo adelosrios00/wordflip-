@@ -5,19 +5,19 @@ import path from "path";
 import fs from "fs/promises";
 
 async function saveImage(file: File): Promise<string> {
+  const ext = file.name.split(".").pop() ?? "jpg";
+  const uniqueName = `words/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
   if (process.env.BLOB_READ_WRITE_TOKEN) {
     const { put } = await import("@vercel/blob");
-    const blob = await put(file.name, file, { access: "public" });
+    const blob = await put(uniqueName, file, { access: "public" });
     return blob.url;
   }
   // Local dev: save to filesystem
   const uploadDir = path.join(process.cwd(), "public", "uploads");
   await fs.mkdir(uploadDir, { recursive: true });
-  const ext = file.name.split(".").pop() ?? "jpg";
-  const filename = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
   const bytes = await file.arrayBuffer();
-  await fs.writeFile(path.join(uploadDir, filename), Buffer.from(bytes));
-  return `/uploads/${filename}`;
+  await fs.writeFile(path.join(uploadDir, uniqueName.replace("words/", "")), Buffer.from(bytes));
+  return `/uploads/${uniqueName.replace("words/", "")}`;
 }
 
 export async function POST(req: NextRequest) {
