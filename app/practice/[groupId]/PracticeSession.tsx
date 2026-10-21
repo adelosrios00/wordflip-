@@ -55,6 +55,7 @@ function getLangName(code: string): string {
   switch (code) {
     case "es": return "Spanish";
     case "fr": return "French";
+    case "la": return "Latin";
     case "de": return "German";
     case "it": return "Italian";
     case "pt": return "Portuguese";
@@ -66,6 +67,7 @@ function getLangCode(code: string): string {
   switch (code) {
     case "es": return "ES";
     case "fr": return "FR";
+    case "la": return "LA";
     case "de": return "DE";
     case "it": return "IT";
     case "pt": return "PT";
@@ -77,6 +79,8 @@ function getSpecialChars(lang: string): string[] {
   switch (lang) {
     case "fr":
       return ["é","è","ê","ë","à","â","ù","û","î","ï","ô","œ","ç","Ç","Œ","?","!"];
+    case "la":
+      return ["ā","ē","ī","ō","ū","Ā","Ē","Ī","Ō","Ū","?","!"];
     default:
       return ["á","é","í","ó","ú","ñ","Á","É","Í","Ó","Ú","Ñ","¿","?","¡","!"];
   }

@@ -26,6 +26,7 @@ function getLangName(code: string) {
   switch (code) {
     case "es": return "Spanish";
     case "fr": return "French";
+    case "la": return "Latin";
     case "de": return "German";
     case "it": return "Italian";
     case "pt": return "Portuguese";
@@ -34,11 +35,12 @@ function getLangName(code: string) {
 }
 
 function getLangCode(code: string) {
-  return { es: "ES", fr: "FR", de: "DE", it: "IT", pt: "PT" }[code] ?? "EN";
+  return { es: "ES", fr: "FR", la: "LA", de: "DE", it: "IT", pt: "PT" }[code] ?? "EN";
 }
 
 function getSpecialChars(lang: string): string[] {
   if (lang === "fr") return ["é","è","ê","ë","à","â","ù","û","î","ï","ô","œ","ç","Ç","Œ","?","!"];
+  if (lang === "la") return ["ā","ē","ī","ō","ū","Ā","Ē","Ī","Ō","Ū","?","!"];
   return ["á","é","í","ó","ú","ñ","Á","É","Í","Ó","Ú","Ñ","¿","?","¡","!"];
 }
 

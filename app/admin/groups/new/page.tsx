@@ -31,6 +31,7 @@ type GroupType = "words" | "phrases";
 const LANGS = [
   { code: "es", label: "Spanish", flag: "🇪🇸" },
   { code: "fr", label: "French", flag: "🇫🇷" },
+  { code: "la", label: "Latin", flag: "🏛️" },
   { code: "de", label: "German", flag: "🇩🇪" },
   { code: "it", label: "Italian", flag: "🇮🇹" },
   { code: "pt", label: "Portuguese", flag: "🇵🇹" },
