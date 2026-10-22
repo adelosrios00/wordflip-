@@ -123,11 +123,12 @@ export default async function TeacherDashboard() {
             </div>
           ) : (
             <div className="flex flex-col gap-2">
-              {classes.map((cls) => (
+              {classes.map((cls, idx) => (
                 <Link
                   key={cls.id}
                   href={`/teacher/classes/${cls.id}`}
-                  className="group flex items-center justify-between bg-white rounded-2xl px-5 py-4 shadow-sm border border-slate-100 hover:border-indigo-200 hover:shadow-md active:scale-[0.99] transition-all"
+                  className="anim-card group flex items-center justify-between bg-white rounded-2xl px-5 py-4 shadow-sm border border-slate-100 hover:border-indigo-200 hover:shadow-md active:scale-[0.99] transition-all"
+                  style={{ animationDelay: `${idx * 70}ms` }}
                 >
                   <div className="flex items-center gap-4">
                     <div className="w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 shadow-sm" style={{ background: "linear-gradient(135deg,#6366f1,#4338ca)" }}>
@@ -174,10 +175,10 @@ export default async function TeacherDashboard() {
             </div>
           ) : (
             <div className="flex flex-col gap-2">
-              {wordGroups.map((g) => {
+              {wordGroups.map((g, idx) => {
                 const lang = LANG_LABELS[g.targetLang];
                 return (
-                  <div key={g.id} className="group bg-white rounded-2xl shadow-sm border border-slate-100 hover:border-emerald-200 hover:shadow-md transition-all overflow-hidden">
+                  <div key={g.id} className="anim-card group bg-white rounded-2xl shadow-sm border border-slate-100 hover:border-emerald-200 hover:shadow-md transition-all overflow-hidden" style={{ animationDelay: `${idx * 70}ms` }}>
                     <Link href={`/admin/groups/${g.id}`} className="flex items-center justify-between px-5 py-4">
                       <div className="flex items-center gap-3">
                         <div

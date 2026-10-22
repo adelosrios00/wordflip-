@@ -175,7 +175,7 @@ export default async function StudentHome() {
                 : CARD_PALETTES[idx % CARD_PALETTES.length];
 
               return (
-                <div key={g.id} className="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
+                <div key={g.id} className="anim-card bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden" style={{ animationDelay: `${idx * 80}ms` }}>
                   <Link href={`/practice/${g.id}`} className="block p-5 group">
 
                     <div className="flex items-start gap-4">
@@ -227,8 +227,8 @@ export default async function StudentHome() {
 
                         <div className="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
                           <div
-                            className="h-2.5 rounded-full transition-all duration-700"
-                            style={{ width: `${mastery}%`, background: pal.bar }}
+                            className="anim-bar h-2.5 rounded-full"
+                            style={{ width: `${mastery}%`, background: pal.bar, animationDelay: `${idx * 80 + 200}ms` }}
                           />
                         </div>
                       </div>
