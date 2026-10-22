@@ -27,15 +27,21 @@ export default async function TeacherDashboard() {
 
   const totalStudents = classes.reduce((a, c) => a + c._count.students, 0);
 
-  const LANG_FLAGS: Record<string, string> = {
-    es: "🇪🇸", fr: "🇫🇷", la: "🏛️", de: "🇩🇪", it: "🇮🇹", pt: "🇵🇹", en: "🇬🇧",
+  const LANG_LABELS: Record<string, { code: string; color: string }> = {
+    es: { code: "ES", color: "#ef4444" },
+    fr: { code: "FR", color: "#3b82f6" },
+    la: { code: "LA", color: "#6366f1" },
+    de: { code: "DE", color: "#f59e0b" },
+    it: { code: "IT", color: "#10b981" },
+    pt: { code: "PT", color: "#8b5cf6" },
+    en: { code: "EN", color: "#06b6d4" },
   };
 
   return (
     <main className="min-h-screen" style={{ background: "#f0f4ff" }}>
 
       {/* Header */}
-      <div style={{ background: "linear-gradient(135deg, #1e1b4b 0%, #312e81 40%, #4338ca 100%)" }} className="relative px-6 pt-10 pb-20">
+      <div style={{ background: "linear-gradient(135deg, #1e1b4b 0%, #312e81 45%, #4338ca 100%)" }} className="relative px-6 pt-10 pb-20">
         <div className="max-w-2xl mx-auto">
           <div className="flex items-center justify-between mb-6">
             <div>
@@ -50,12 +56,36 @@ export default async function TeacherDashboard() {
 
           <div className="grid grid-cols-3 gap-3">
             {[
-              { emoji: "🏫", label: "Clases", value: classes.length },
-              { emoji: "👩‍🎓", label: "Alumnos", value: totalStudents },
-              { emoji: "📚", label: "Grupos", value: wordGroups.length },
+              {
+                value: classes.length,
+                label: "Clases",
+                icon: (
+                  <svg className="w-5 h-5 text-white/80" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                  </svg>
+                ),
+              },
+              {
+                value: totalStudents,
+                label: "Alumnos",
+                icon: (
+                  <svg className="w-5 h-5 text-white/80" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                ),
+              },
+              {
+                value: wordGroups.length,
+                label: "Grupos",
+                icon: (
+                  <svg className="w-5 h-5 text-white/80" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                  </svg>
+                ),
+              },
             ].map((s) => (
-              <div key={s.label} className="bg-white/10 border border-white/20 backdrop-blur-sm rounded-2xl px-3 py-3.5 text-center">
-                <div className="text-xl mb-0.5">{s.emoji}</div>
+              <div key={s.label} className="bg-white/10 border border-white/20 rounded-2xl px-3 py-3 text-center">
+                <div className="flex justify-center mb-1">{s.icon}</div>
                 <p className="text-2xl font-black text-white">{s.value}</p>
                 <p className="text-indigo-200 text-xs font-semibold mt-0.5 tracking-wide">{s.label}</p>
               </div>
@@ -63,7 +93,6 @@ export default async function TeacherDashboard() {
           </div>
         </div>
 
-        {/* Wave */}
         <svg className="absolute bottom-0 left-0 w-full" viewBox="0 0 1440 40" preserveAspectRatio="none">
           <path d="M0,20 C360,40 1080,0 1440,20 L1440,40 L0,40 Z" fill="#f0f4ff" />
         </svg>
@@ -85,7 +114,11 @@ export default async function TeacherDashboard() {
 
           {classes.length === 0 ? (
             <div className="bg-white border-2 border-dashed border-indigo-100 rounded-3xl p-8 text-center">
-              <div className="text-4xl mb-2">🏫</div>
+              <div className="w-12 h-12 rounded-2xl bg-indigo-50 flex items-center justify-center mx-auto mb-3">
+                <svg className="w-6 h-6 text-indigo-300" fill="none" stroke="currentColor" strokeWidth="1.75" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                </svg>
+              </div>
               <p className="text-slate-400 text-sm font-semibold">Todavía no tienes clases. ¡Crea la primera!</p>
             </div>
           ) : (
@@ -94,11 +127,13 @@ export default async function TeacherDashboard() {
                 <Link
                   key={cls.id}
                   href={`/teacher/classes/${cls.id}`}
-                  className="group flex items-center justify-between bg-white rounded-2xl px-5 py-4 shadow-sm border border-slate-100 hover:border-indigo-300 hover:shadow-md active:scale-[0.99] transition-all"
+                  className="group flex items-center justify-between bg-white rounded-2xl px-5 py-4 shadow-sm border border-slate-100 hover:border-indigo-200 hover:shadow-md active:scale-[0.99] transition-all"
                 >
                   <div className="flex items-center gap-4">
-                    <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-indigo-500 to-indigo-700 flex items-center justify-center shrink-0 shadow-sm">
-                      <span className="text-lg">🏫</span>
+                    <div className="w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 shadow-sm" style={{ background: "linear-gradient(135deg,#6366f1,#4338ca)" }}>
+                      <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                      </svg>
                     </div>
                     <div>
                       <p className="font-black text-slate-800">{cls.name}</p>
@@ -107,7 +142,7 @@ export default async function TeacherDashboard() {
                       </p>
                     </div>
                   </div>
-                  <svg className="w-4 h-4 text-slate-300 group-hover:text-indigo-500 group-hover:translate-x-0.5 transition-all" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4 text-slate-300 group-hover:text-indigo-400 group-hover:translate-x-0.5 transition-all" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M9 18l6-6-6-6" />
                   </svg>
                 </Link>
@@ -130,43 +165,61 @@ export default async function TeacherDashboard() {
 
           {wordGroups.length === 0 ? (
             <div className="bg-white border-2 border-dashed border-emerald-100 rounded-3xl p-8 text-center">
-              <div className="text-4xl mb-2">📚</div>
+              <div className="w-12 h-12 rounded-2xl bg-emerald-50 flex items-center justify-center mx-auto mb-3">
+                <svg className="w-6 h-6 text-emerald-300" fill="none" stroke="currentColor" strokeWidth="1.75" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                </svg>
+              </div>
               <p className="text-slate-400 text-sm font-semibold">No hay grupos todavía. ¡Crea el primero!</p>
             </div>
           ) : (
             <div className="flex flex-col gap-2">
-              {wordGroups.map((g) => (
-                <div key={g.id} className="group bg-white rounded-2xl shadow-sm border border-slate-100 hover:border-emerald-200 hover:shadow-md transition-all overflow-hidden">
-                  <Link
-                    href={`/admin/groups/${g.id}`}
-                    className="flex items-center justify-between px-5 py-4"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className={`w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 shadow-sm ${
-                        g.groupType === "phrases"
-                          ? "bg-gradient-to-br from-violet-400 to-violet-600"
-                          : "bg-gradient-to-br from-blue-400 to-blue-600"
-                      }`}>
-                        <span className="text-lg">{g.groupType === "phrases" ? "💬" : "📖"}</span>
+              {wordGroups.map((g) => {
+                const lang = LANG_LABELS[g.targetLang];
+                return (
+                  <div key={g.id} className="group bg-white rounded-2xl shadow-sm border border-slate-100 hover:border-emerald-200 hover:shadow-md transition-all overflow-hidden">
+                    <Link href={`/admin/groups/${g.id}`} className="flex items-center justify-between px-5 py-4">
+                      <div className="flex items-center gap-3">
+                        <div
+                          className="w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 shadow-sm"
+                          style={{ background: g.groupType === "phrases" ? "linear-gradient(135deg,#a78bfa,#7c3aed)" : "linear-gradient(135deg,#60a5fa,#2563eb)" }}
+                        >
+                          {g.groupType === "phrases" ? (
+                            <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                            </svg>
+                          ) : (
+                            <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                            </svg>
+                          )}
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <p className="font-black text-slate-800">{g.name}</p>
+                            {lang && (
+                              <span className="text-xs font-black px-1.5 py-0.5 rounded-md text-white" style={{ background: lang.color, fontSize: 10 }}>
+                                {lang.code}
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-slate-400 text-xs mt-0.5 font-medium">
+                            {g.groupType === "phrases" ? "Frases" : "Palabras"} · {g._count.words} entradas
+                          </p>
+                        </div>
                       </div>
-                      <div>
-                        <p className="font-black text-slate-800">{g.name}</p>
-                        <p className="text-slate-400 text-xs mt-0.5 font-medium">
-                          {LANG_FLAGS[g.targetLang] ?? "🌐"} {g.groupType === "phrases" ? "Frases" : "Palabras"} · {g._count.words} entradas
-                        </p>
+                      <div className="flex items-center gap-1">
+                        <PreviewGroupButton groupId={g.id} />
+                        <DuplicateGroupButton groupId={g.id} />
+                        <DeleteGroupButton groupId={g.id} groupName={g.name} />
+                        <svg className="w-4 h-4 text-slate-300 group-hover:text-emerald-400 group-hover:translate-x-0.5 transition-all ml-1" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M9 18l6-6-6-6" />
+                        </svg>
                       </div>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <PreviewGroupButton groupId={g.id} />
-                      <DuplicateGroupButton groupId={g.id} />
-                      <DeleteGroupButton groupId={g.id} groupName={g.name} />
-                      <svg className="w-4 h-4 text-slate-300 group-hover:text-emerald-500 group-hover:translate-x-0.5 transition-all ml-1" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 18l6-6-6-6" />
-                      </svg>
-                    </div>
-                  </Link>
-                </div>
-              ))}
+                    </Link>
+                  </div>
+                );
+              })}
             </div>
           )}
         </section>
