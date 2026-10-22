@@ -9,11 +9,11 @@ function formatDeadline(deadline: Date): { label: string; urgent: boolean } {
   const now = new Date();
   const diff = deadline.getTime() - now.getTime();
   const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
-  if (days < 0) return { label: "Vencido", urgent: true };
-  if (days === 0) return { label: "Hoy", urgent: true };
-  if (days === 1) return { label: "Mañana", urgent: true };
-  if (days <= 3) return { label: `${days} días`, urgent: true };
-  return { label: `${days} días`, urgent: false };
+  if (days < 0) return { label: "Past due", urgent: true };
+  if (days === 0) return { label: "Due today", urgent: true };
+  if (days === 1) return { label: "Due tomorrow", urgent: true };
+  if (days <= 3) return { label: `${days} days`, urgent: true };
+  return { label: `${days} days`, urgent: false };
 }
 
 const CARD_PALETTES = [
@@ -38,8 +38,8 @@ export default async function StudentHome() {
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
             </svg>
           </div>
-          <h1 className="text-xl font-black text-slate-800 mb-2">Sin clase asignada</h1>
-          <p className="text-slate-500 text-sm">Tu profesor todavía no te ha asignado a una clase.</p>
+          <h1 className="text-xl font-black text-slate-800 mb-2">No class assigned</h1>
+          <p className="text-slate-500 text-sm">Your teacher hasn&apos;t assigned you to a class yet.</p>
         </div>
       </main>
     );
@@ -101,7 +101,7 @@ export default async function StudentHome() {
                 {cls.name}
               </span>
               <h1 className="text-3xl font-black text-white leading-tight">
-                Hola, {student.name}
+                Hello, {student.name}
               </h1>
             </div>
             <LogoutStudentButton />
@@ -120,7 +120,7 @@ export default async function StudentHome() {
               },
               {
                 value: completed,
-                label: "Completados",
+                label: "Completed",
                 icon: (
                   <svg className="w-5 h-5 text-white/80" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
@@ -129,7 +129,7 @@ export default async function StudentHome() {
               },
               {
                 value: `${overallPct}%`,
-                label: "Progreso",
+                label: "Progress",
                 icon: (
                   <svg className="w-5 h-5 text-white/80" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
@@ -160,7 +160,7 @@ export default async function StudentHome() {
                 <path strokeLinecap="round" strokeLinejoin="round" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
               </svg>
             </div>
-            <p className="text-slate-500 font-semibold">Tu profesor todavía no ha asignado ningún set.</p>
+            <p className="text-slate-500 font-semibold">Your teacher hasn&apos;t assigned any sets to your class yet.</p>
           </div>
         ) : (
           <div className="flex flex-col gap-4 pt-2">
@@ -209,7 +209,7 @@ export default async function StudentHome() {
 
                         <div className="flex items-center gap-2 mb-3">
                           <p className="text-xs text-slate-400 font-medium">
-                            {g._count.words} {g.groupType === "phrases" ? "frases" : "palabras"}
+                            {g._count.words} {g.groupType === "phrases" ? "phrases" : "words"}
                           </p>
                           {timesCompleted > 0 && (
                             <span className="text-xs font-bold bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full">
@@ -249,21 +249,21 @@ export default async function StudentHome() {
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                           </svg>
-                          Completado — Repasar
+                          Completed — Review
                         </>
                       ) : isStarted ? (
                         <>
                           <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                             <path d="M8 5v14l11-7z" />
                           </svg>
-                          Continuar
+                          Continue
                         </>
                       ) : (
                         <>
                           <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                             <path d="M8 5v14l11-7z" />
                           </svg>
-                          Empezar
+                          Start
                         </>
                       )}
                     </div>
@@ -279,7 +279,7 @@ export default async function StudentHome() {
                         <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
                         </svg>
-                        Repaso rápido — solo palabras pendientes
+                        Quick review — pending words only
                       </Link>
                     </div>
                   )}

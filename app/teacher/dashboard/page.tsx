@@ -45,11 +45,11 @@ export default async function TeacherDashboard() {
         <div className="max-w-2xl mx-auto">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <p className="text-indigo-300 text-xs font-semibold uppercase tracking-widest mb-1">Panel del Profesor</p>
+              <p className="text-indigo-300 text-xs font-semibold uppercase tracking-widest mb-1">Teacher Dashboard</p>
               <h1 className="text-2xl font-black text-white uppercase tracking-wide">{teacher.username}</h1>
             </div>
             <div className="flex items-center gap-4">
-              <Link href="/" className="text-indigo-300 hover:text-white text-sm font-semibold transition-colors">Inicio</Link>
+              <Link href="/" className="text-indigo-300 hover:text-white text-sm font-semibold transition-colors">Home</Link>
               <LogoutTeacherButton />
             </div>
           </div>
@@ -58,7 +58,7 @@ export default async function TeacherDashboard() {
             {[
               {
                 value: classes.length,
-                label: "Clases",
+                label: "Classes",
                 icon: (
                   <svg className="w-5 h-5 text-white/80" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
@@ -67,7 +67,7 @@ export default async function TeacherDashboard() {
               },
               {
                 value: totalStudents,
-                label: "Alumnos",
+                label: "Students",
                 icon: (
                   <svg className="w-5 h-5 text-white/80" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -76,7 +76,7 @@ export default async function TeacherDashboard() {
               },
               {
                 value: wordGroups.length,
-                label: "Grupos",
+                label: "Groups",
                 icon: (
                   <svg className="w-5 h-5 text-white/80" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
@@ -103,12 +103,12 @@ export default async function TeacherDashboard() {
         {/* Mis clases */}
         <section className="mb-6 pt-2">
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-xs font-black text-slate-600 uppercase tracking-widest">Mis clases</h2>
+            <h2 className="text-xs font-black text-slate-600 uppercase tracking-widest">My classes</h2>
             <Link
               href="/teacher/classes/new"
               className="px-4 py-2 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 active:scale-95 transition-all text-sm shadow-sm"
             >
-              + Nueva clase
+              + New class
             </Link>
           </div>
 
@@ -119,7 +119,7 @@ export default async function TeacherDashboard() {
                   <path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                 </svg>
               </div>
-              <p className="text-slate-400 text-sm font-semibold">Todavía no tienes clases. ¡Crea la primera!</p>
+              <p className="text-slate-400 text-sm font-semibold">No classes yet. Create your first one!</p>
             </div>
           ) : (
             <div className="flex flex-col gap-2">
@@ -138,7 +138,7 @@ export default async function TeacherDashboard() {
                     <div>
                       <p className="font-black text-slate-800">{cls.name}</p>
                       <p className="text-slate-400 text-xs mt-0.5 font-medium">
-                        {cls._count.students} alumnos · {cls._count.groups} grupos asignados
+                        {cls._count.students} students · {cls._count.groups} groups assigned
                       </p>
                     </div>
                   </div>
@@ -154,12 +154,12 @@ export default async function TeacherDashboard() {
         {/* Grupos de vocabulario */}
         <section className="mb-10">
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-xs font-black text-slate-600 uppercase tracking-widest">Grupos de vocabulario</h2>
+            <h2 className="text-xs font-black text-slate-600 uppercase tracking-widest">Vocabulary groups</h2>
             <Link
               href="/admin/groups/new"
               className="px-4 py-2 bg-emerald-500 text-white font-bold rounded-xl hover:bg-emerald-600 active:scale-95 transition-all text-sm shadow-sm"
             >
-              + Nuevo grupo
+              + New group
             </Link>
           </div>
 
@@ -170,7 +170,7 @@ export default async function TeacherDashboard() {
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                 </svg>
               </div>
-              <p className="text-slate-400 text-sm font-semibold">No hay grupos todavía. ¡Crea el primero!</p>
+              <p className="text-slate-400 text-sm font-semibold">No groups yet. Create the first one!</p>
             </div>
           ) : (
             <div className="flex flex-col gap-2">
@@ -204,7 +204,7 @@ export default async function TeacherDashboard() {
                             )}
                           </div>
                           <p className="text-slate-400 text-xs mt-0.5 font-medium">
-                            {g.groupType === "phrases" ? "Frases" : "Palabras"} · {g._count.words} entradas
+                            {g.groupType === "phrases" ? "Phrases" : "Words"} · {g._count.words} entries
                           </p>
                         </div>
                       </div>
