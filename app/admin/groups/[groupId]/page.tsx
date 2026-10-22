@@ -93,6 +93,14 @@ export default function EditGroupPage({ params }: Props) {
     setWords((prev) => prev.filter((_, i) => i !== index));
   }
 
+  function clearImage(index: number) {
+    setWords((prev) => {
+      const next = [...prev];
+      next[index] = { ...next[index], image: null, imagePreview: null, existingImageUrl: null };
+      return next;
+    });
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
@@ -211,11 +219,21 @@ export default function EditGroupPage({ params }: Props) {
                   />
                 </label>
                 {(word.imagePreview || word.existingImageUrl) && (
-                  <img
-                    src={word.imagePreview ?? word.existingImageUrl ?? ""}
-                    alt=""
-                    className="h-16 w-16 object-cover rounded-xl border border-gray-200"
-                  />
+                  <div className="relative">
+                    <img
+                      src={word.imagePreview ?? word.existingImageUrl ?? ""}
+                      alt=""
+                      className="h-16 w-16 object-cover rounded-xl border border-gray-200"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => clearImage(i)}
+                      className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-red-500 hover:bg-red-600 text-white rounded-full text-sm font-bold flex items-center justify-center leading-none transition-colors"
+                      title="Remove image"
+                    >
+                      ×
+                    </button>
+                  </div>
                 )}
               </div>
             </div>

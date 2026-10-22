@@ -80,6 +80,14 @@ export default function NewGroupPage() {
     setWords((prev) => prev.filter((_, i) => i !== index));
   }
 
+  function clearImage(index: number) {
+    setWords((prev) => {
+      const next = [...prev];
+      next[index] = { ...next[index], image: null, imagePreview: null };
+      return next;
+    });
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
@@ -220,7 +228,7 @@ export default function NewGroupPage() {
               </div>
               <div className="flex items-center gap-3">
                 <label className="cursor-pointer px-3 py-1.5 bg-slate-100 hover:bg-slate-200 rounded-lg text-slate-600 font-medium transition-colors text-xs">
-                  Upload image
+                  {w.imagePreview ? "Change image" : "Upload image"}
                   <input
                     type="file"
                     accept="image/*"
@@ -232,7 +240,17 @@ export default function NewGroupPage() {
                   />
                 </label>
                 {w.imagePreview && (
-                  <img src={w.imagePreview} alt="" className="h-10 w-10 object-cover rounded-lg border border-slate-200" />
+                  <div className="relative">
+                    <img src={w.imagePreview} alt="" className="h-10 w-10 object-cover rounded-lg border border-slate-200" />
+                    <button
+                      type="button"
+                      onClick={() => clearImage(i)}
+                      className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-red-500 hover:bg-red-600 text-white rounded-full text-xs font-bold flex items-center justify-center leading-none transition-colors"
+                      title="Remove image"
+                    >
+                      ×
+                    </button>
+                  </div>
                 )}
               </div>
             </div>

@@ -27,37 +27,39 @@ export default async function TeacherDashboard() {
 
   const totalStudents = classes.reduce((a, c) => a + c._count.students, 0);
 
+  const LANG_FLAGS: Record<string, string> = {
+    es: "🇪🇸", fr: "🇫🇷", la: "🏛️", de: "🇩🇪", it: "🇮🇹", pt: "🇵🇹", en: "🇬🇧",
+  };
+
   return (
     <main className="min-h-screen" style={{ background: "#f1f5f9" }}>
 
       {/* Header */}
-      <div style={{ background: "linear-gradient(135deg, #1e40af 0%, #2563eb 60%, #3b82f6 100%)" }} className="px-6 pt-10 pb-16">
+      <div style={{ background: "linear-gradient(135deg, #1e3a8a 0%, #2563eb 65%, #3b82f6 100%)" }} className="px-6 pt-10 pb-20">
         <div className="max-w-2xl mx-auto">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-blue-200 text-xs font-bold uppercase tracking-widest mb-1">Panel del Profesor</p>
-              <h1 className="text-3xl font-black text-white capitalize">{teacher.username}</h1>
+              <p className="text-blue-300 text-xs font-semibold uppercase tracking-widest mb-1">Panel del Profesor</p>
+              <h1 className="text-2xl font-black text-white uppercase tracking-wide">{teacher.username}</h1>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-4">
               <Link href="/" className="text-blue-200 hover:text-white text-sm font-semibold transition-colors">Inicio</Link>
               <LogoutTeacherButton />
             </div>
           </div>
 
           {/* Stats */}
-          <div className="flex gap-3 mt-8">
-            <div className="flex-1 bg-white/15 backdrop-blur rounded-2xl px-4 py-3 text-center">
-              <p className="text-2xl font-black text-white">{classes.length}</p>
-              <p className="text-blue-200 text-xs font-semibold mt-0.5">Clases</p>
-            </div>
-            <div className="flex-1 bg-white/15 backdrop-blur rounded-2xl px-4 py-3 text-center">
-              <p className="text-2xl font-black text-white">{totalStudents}</p>
-              <p className="text-blue-200 text-xs font-semibold mt-0.5">Alumnos</p>
-            </div>
-            <div className="flex-1 bg-white/15 backdrop-blur rounded-2xl px-4 py-3 text-center">
-              <p className="text-2xl font-black text-white">{wordGroups.length}</p>
-              <p className="text-blue-200 text-xs font-semibold mt-0.5">Grupos</p>
-            </div>
+          <div className="flex gap-3 mt-7">
+            {[
+              { label: "Clases", value: classes.length },
+              { label: "Alumnos", value: totalStudents },
+              { label: "Grupos", value: wordGroups.length },
+            ].map((s) => (
+              <div key={s.label} className="flex-1 bg-white/10 border border-white/20 rounded-2xl px-3 py-3.5 text-center">
+                <p className="text-2xl font-black text-white">{s.value}</p>
+                <p className="text-blue-200 text-xs font-semibold mt-0.5 tracking-wide">{s.label}</p>
+              </div>
+            ))}
           </div>
         </div>
       </div>
@@ -68,7 +70,7 @@ export default async function TeacherDashboard() {
         {/* Mis clases */}
         <section className="mb-4">
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-sm font-bold text-white/70 uppercase tracking-widest">Mis clases</h2>
+            <h2 className="text-xs font-bold text-slate-500 uppercase tracking-widest">Mis clases</h2>
             <Link
               href="/teacher/classes/new"
               className="px-4 py-2 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition-all text-sm shadow-sm"
@@ -115,7 +117,7 @@ export default async function TeacherDashboard() {
         {/* Grupos de vocabulario */}
         <section className="mb-8">
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-sm font-bold text-white/70 uppercase tracking-widest">Grupos de vocabulario</h2>
+            <h2 className="text-xs font-bold text-slate-500 uppercase tracking-widest">Grupos de vocabulario</h2>
             <Link
               href="/admin/groups/new"
               className="px-4 py-2 bg-emerald-500 text-white font-bold rounded-xl hover:bg-emerald-600 transition-all text-sm shadow-sm"
@@ -153,18 +155,11 @@ export default async function TeacherDashboard() {
                     <div>
                       <p className="font-bold text-slate-800">{g.name}</p>
                       <p className="text-slate-400 text-xs mt-0.5">
-                        {g.groupType === "phrases" ? "Frases" : "Palabras"} · {g._count.words} entradas
+                        {LANG_FLAGS[g.targetLang] ?? "🌐"} {g.groupType === "phrases" ? "Frases" : "Palabras"} · {g._count.words} entradas
                       </p>
                     </div>
                   </div>
                   <div className="flex items-center gap-1">
-                    <span className={`text-xs font-bold px-3 py-1 rounded-full ${
-                      g.groupType === "phrases"
-                        ? "bg-violet-50 text-violet-600"
-                        : "bg-blue-50 text-blue-600"
-                    }`}>
-                      {g.groupType === "phrases" ? "Frases" : "Palabras"}
-                    </span>
                     <PreviewGroupButton groupId={g.id} />
                     <DuplicateGroupButton groupId={g.id} />
                     <DeleteGroupButton groupId={g.id} groupName={g.name} />
