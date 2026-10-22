@@ -70,7 +70,7 @@ export default async function TeacherDashboard() {
         {/* Mis clases */}
         <section className="mb-4">
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-xs font-bold text-slate-500 uppercase tracking-widest">Mis clases</h2>
+            <h2 className="text-xs font-bold text-slate-700 uppercase tracking-widest">Mis clases</h2>
             <Link
               href="/teacher/classes/new"
               className="px-4 py-2 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition-all text-sm shadow-sm"
@@ -117,7 +117,7 @@ export default async function TeacherDashboard() {
         {/* Grupos de vocabulario */}
         <section className="mb-8">
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-xs font-bold text-slate-500 uppercase tracking-widest">Grupos de vocabulario</h2>
+            <h2 className="text-xs font-bold text-slate-700 uppercase tracking-widest">Grupos de vocabulario</h2>
             <Link
               href="/admin/groups/new"
               className="px-4 py-2 bg-emerald-500 text-white font-bold rounded-xl hover:bg-emerald-600 transition-all text-sm shadow-sm"
