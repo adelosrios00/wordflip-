@@ -145,6 +145,16 @@ export function PracticeSession({ words, studentId, groupId, groupName, groupTyp
   const [typCorrect, setTypCorrect] = useState(false);
   const typRef = useRef<HTMLInputElement>(null);
 
+  const [flashType, setFlashType] = useState<"correct" | "wrong" | null>(null);
+  const [flashKey, setFlashKey] = useState(0);
+  const [lastWrongOpt, setLastWrongOpt] = useState<string | null>(null);
+
+  function triggerFlash(type: "correct" | "wrong") {
+    setFlashType(type);
+    setFlashKey((k) => k + 1);
+    setTimeout(() => setFlashType(null), 500);
+  }
+
   useEffect(() => {
     if (phase === "complete" || !word) return;
     setWrongOpts(new Set());
@@ -190,9 +200,13 @@ export function PracticeSession({ words, studentId, groupId, groupName, groupTyp
     const field = phase === "match_es_en" ? "english" : "spanish";
     if (opt === word[field]) {
       setMatchCorrect(true);
-      setTimeout(() => advance(), 450);
+      triggerFlash("correct");
+      setTimeout(() => advance(), 500);
     } else {
       setWrongOpts((prev) => new Set([...prev, opt]));
+      setLastWrongOpt(opt);
+      triggerFlash("wrong");
+      setTimeout(() => setLastWrongOpt(null), 400);
     }
   }
 
@@ -208,6 +222,7 @@ export function PracticeSession({ words, studentId, groupId, groupName, groupTyp
       if (next >= word.spanish.length) setTimeout(() => advance(), 400);
     } else {
       setScramFlash(true);
+      triggerFlash("wrong");
       setTimeout(() => setScramFlash(false), 400);
     }
   }
@@ -222,9 +237,11 @@ export function PracticeSession({ words, studentId, groupId, groupName, groupTyp
     const target = phase === "type_en" ? word.english : word.spanish;
     if (normalize(typVal) === normalize(target)) {
       setTypCorrect(true);
+      triggerFlash("correct");
       setTimeout(() => { setTypVal(""); setTypCorrect(false); advance(); }, 600);
     } else {
       setTypWrong(true);
+      triggerFlash("wrong");
     }
   }
 
@@ -367,6 +384,17 @@ export function PracticeSession({ words, studentId, groupId, groupName, groupTyp
 
   return (
     <div className="max-w-2xl mx-auto p-6">
+      {/* Full-screen flash overlay */}
+      {flashType && (
+        <div
+          key={flashKey}
+          className="pointer-events-none fixed inset-0 z-40"
+          style={{
+            background: flashType === "correct" ? "#10b981" : "#ef4444",
+            animation: "flashOverlay 0.5s ease forwards",
+          }}
+        />
+      )}
       <div className="flex items-center justify-between mb-3">
         <Link href="/home" className="text-blue-600 hover:underline text-lg">← Sets</Link>
         <h1 className="text-xl font-bold text-gray-700 truncate mx-4">{groupName}</h1>
@@ -401,10 +429,10 @@ export function PracticeSession({ words, studentId, groupId, groupName, groupTyp
                   onClick={() => handleMatch(opt)}
                   disabled={isWrong || matchCorrect}
                   className={`text-xl font-bold py-6 px-4 rounded-2xl border-4 transition-all ${
-                    isCorrect ? "border-green-500 bg-green-50 text-green-800 scale-105"
+                    isCorrect ? "border-green-500 bg-green-50 text-green-800 anim-pop"
                     : isWrong ? "border-red-500 bg-red-50 text-red-500 opacity-60 cursor-not-allowed"
                     : "border-gray-200 bg-white hover:border-blue-400 hover:bg-blue-50 active:scale-95 cursor-pointer"
-                  }`}
+                  } ${lastWrongOpt === opt ? "anim-shake" : ""}`}
                 >
                   {opt}
                 </button>
